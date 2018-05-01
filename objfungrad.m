@@ -1,0 +1,39 @@
+function [f,gradf] = objfungrad(x)
+
+    % x = [Na1,Na2,Fc1,Fc2,Fc3,c1,c2,c3,alpha1,alpha2,alpha3,L]
+    % setting the cost on state variables to zero here
+    
+    k1=2;
+    k2=1;
+    k3=0;
+    
+    R=zeros(12);
+    R(1,1)=k1;
+    R(2,2)=k1;
+    R(3,3)=k2;
+    R(4,4)=k2;
+    R(5,5)=k2;
+    R(6,6)=k3;
+    R(7,7)=k3;
+    R(8,8)=k3;
+   
+    f=x*R*x'
+    
+    % Gradient of the objective function:
+    if nargout  > 1
+        gradf=[2*R(1,1)*x(1),...
+            2*R(2,2)*x(2),...
+            2*R(3,3)*x(3),...
+            2*R(4,4)*x(4),...
+            2*R(5,5)*x(5),...
+            2*R(6,6)*x(6),...
+            2*R(7,7)*x(7),...
+            2*R(8,8)*x(8),...
+            0,...
+            0,...
+            0,...
+            0,...
+            ];
+    end
+
+end
