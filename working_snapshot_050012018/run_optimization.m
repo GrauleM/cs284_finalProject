@@ -6,8 +6,9 @@ x0 = rand(1,12)./10;            % Starting guess
 x0(12)=q0(4);
 x0(9:12)=q0;
 options = optimoptions(@fmincon,'Algorithm','sqp');
+options = optimoptions(@fmincon,'Display','iter');
 options = optimoptions(options,'SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',false);
-options = optimoptions(options,'MaxFunctionEvaluations',10000);
+options = optimoptions(options,'MaxFunctionEvaluations',20000);
 
 lb = [ ]; ub = [ ];   % No upper or lower bounds
 [x,fval] = fmincon(@objfungrad,x0,[],[],[],[],lb,ub,... 
