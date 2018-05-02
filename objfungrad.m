@@ -3,8 +3,8 @@ function [f,gradf] = objfungrad(x)
     % x = [Na1,Na2,Fc1,Fc2,Fc3,c1,c2,c3,alpha1,alpha2,alpha3,L]
     % setting the cost on state variables to zero here
     
-    k1=0.2;
-    k2=.01;
+    k1=2;
+    k2=1;
     
     R=zeros(12);
     R(1,1)=k1;

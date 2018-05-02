@@ -1,27 +1,34 @@
-function [c,ceq,DC,DCeq] = confungrad(x)
+function [c,ceq,DC,DCeq] = confungrad(x,q_des)
 
     % x = [Na1,Na2,Fc1,Fc2,Fc3,c1,c2,c3,alpha1,alpha2,alpha3,L]
     
-    multiplication_factor=100;
-    phys_sln_multFactor=20;
+    multiplication_factor=1;
+    phys_sln_multFactor=1;
     
-    E=100;
+    r_actuator=0.02; %actuator diameter in meter
+    I_actuator=1./4.*pi*r_actuator^4; %moment of inertia of actuator
+    A_actuator=pi.*r_actuator^2;
+    d=0.05; %distance from center (spine) to middle of actuator
+
+    L0=1; %1cm
+    E=0.05*10^9; %the Youngs modulus of silicone rubber is 0.05GPa
+    I=2.*(I_actuator+d^2.*A_actuator);
+    
+    E=1;
     I=1;
-    L0=1;
+    
     % desired actuator state
-    q_des=[.1,.5,.0,1];
     q=x(9:12);
     a1=q(1);
     a2=q(2);
     a3=q(3);
     L=q(4);
-
+    
 
     %[a1,a2,a3,L]=q(1,1:4);
     c_vec=x(6:8);
     Fc_vec=x(3:5);
     Na=x(1)+x(2);
-    d=0.05;
     Ma=d*(x(2)-x(1));
     
     % useful functions
@@ -120,13 +127,22 @@ function [c,ceq,DC,DCeq] = confungrad(x)
     
     % Gradient of the constraints:
     if nargout > 2
-        DC= [...
+        DC= [zeros(1,5),-1.,zeros(1,6);...
+            zeros(1,5),1.,zeros(1,6);...
+            zeros(1,6),-1.,zeros(1,5);...
+            zeros(1,6),1.,zeros(1,5);...
+            zeros(1,7),-1.,zeros(1,4);...
+            zeros(1,7),1.,zeros(1,4)...
             ];
         DCeq = multiplication_factor.*[...
-            zeros(1,8), -1, zeros(1,3);... %dc1/dx(i)
-            zeros(1,9), -1,zeros(1,2);... %dc2/dx(i)
-            zeros(1,10), -1, 0;... %dc3/dx(i)
-            zeros(1,11), -1;... %dc4/dx(i)
+            zeros(1,8), -1., zeros(1,3);... %dc1/dx(i)
+            zeros(1,9), -1.,zeros(1,2);... %dc2/dx(i)
+            zeros(1,10), -1., 0;... %dc3/dx(i)
+            zeros(1,11), -1.; ... %dc4/dx(i)
+            ; ... %dc5/dx(i)
+            ; ... %dc6/dx(i)
+            ; ... %dc7/dx(i)
+            ; ... %dc8/dx(i)            
             ];
     end
 
