@@ -11,7 +11,7 @@ function visualize_q(q,L_0,figHandle,color,style)
     sin_phi_s =@(s) sin(q(1)./q(4).*s+q(2)./q(4).*(s.^2./q(4)-s)+q(3)./q(4).*(2.*s.^3./q(4).^2-3.*s.^2./q(4)+s));  
 
     all_phi=phi_s(all_s);
-    length(x_s)
+    length(x_s);
     for i=1:length(x_s)
         x_s(i)=integral(cos_phi_s,0,all_s(i)); %xx here it may be better to do gauss-legendre quadrature
         y_s(i)=integral(sin_phi_s,0,all_s(i)); %xx here it may be better to do gauss-legendre quadrature

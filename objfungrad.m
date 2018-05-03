@@ -14,7 +14,7 @@ function [f,gradf] = objfungrad(x)
     R(5,5)=k2;
 
    
-    f=x*R*x'
+    f=x*R*x';
     
     % Gradient of the objective function:
     if nargout  > 1

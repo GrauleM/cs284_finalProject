@@ -25,8 +25,8 @@ function visualize_q_wContact(q,contacts,L_0,figHandle,color,style)
     
     for i=1:length(contacts)
         
-        plot(xc_c(contacts(i)),yc_c(contacts(i)),'ro')
-        text(1.05*xc_c(contacts(i)),1.05*yc_c(contacts(i)),num2str(i),'Color','r')
+        plot(xc_c(contacts(i)),yc_c(contacts(i)),'ro');
+        text(1.05*xc_c(contacts(i)),1.05*yc_c(contacts(i)),num2str(i),'Color','r');
     end
         
         

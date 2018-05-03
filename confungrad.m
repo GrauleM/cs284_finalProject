@@ -33,49 +33,39 @@ function [c,ceq,DC,DCeq] = confungrad(x,q_des)
     
     % useful functions
     %note: s from 0 to L
-    phi_s = @(s) q(1)./q(4).*s+q(2)./q(4).*(s.^2./q(4)-s)+q(3)./q(4).*(2.*s.^3./q(4).^2-3.*s.^2./q(4)+s);
-    cos_phi_s =@(s) cos(q(1)./q(4).*s+q(2)./q(4).*(s.^2./q(4)-s)+q(3)./q(4).*(2.*s.^3./q(4).^2-3.*s.^2./q(4)+s));  
-    sin_phi_s =@(s) sin(q(1)./q(4).*s+q(2)./q(4).*(s.^2./q(4)-s)+q(3)./q(4).*(2.*s.^3./q(4).^2-3.*s.^2./q(4)+s));  
+    phi_s = @(s) q(1)./q(4).*s+q(2)./q(4).*(s.^2./q(4)-s)+q(3)./q(4).*(2.*s.^3./q(4).^2-3.*s.^2./q(4)+s); %CHECKED
     
-    dphidalpha1_s = @(s) s./L;
-    dphidalpha2_s = @(s) s^2./L^2-s/L;
-    dphidalpha3_s = @(s) 2*s^3/L^3-s^2./L^2+s/L;
-    dphidL_s = @(s) -s./L^2*(a1-a2+a3)-2*s^2/L^3*(a2-3*a3)-6*s^3/L^4*a3;
+    dphidalpha1_s = @(s) s./L; %CHECKED
+    dphidalpha2_s = @(s) s^2./L^2-s/L;  %CHECKED
+    dphidalpha3_s = @(s) 2*s^3/L^3-3.*s^2./L^2+s/L; %FIXED
+    dphidL_s = @(s) -s./L^2*(a1-a2+a3)-2*s^2/L^3*(a2-3*a3)-6*s^3/L^4*a3; %CHECKED
     
     %integrand for gradients of xc and yc with respect to elements of q as functions of s
-    f1_s=@(s) -sin(q(1)./q(4).*s+q(2)./q(4).*(s.^2./q(4)-s)+q(3)./q(4).*(2.*s.^3./q(4).^2-3.*s.^2./q(4)+s)).*...
-        s./L;
-    f2_s=@(s) -sin(q(1)./q(4).*s+q(2)./q(4).*(s.^2./q(4)-s)+q(3)./q(4).*(2.*s.^3./q(4).^2-3.*s.^2./q(4)+s)).*...
-        s.^2./L.^2-s./L;
-    f3_s=@(s) -sin(q(1)./q(4).*s+q(2)./q(4).*(s.^2./q(4)-s)+q(3)./q(4).*(2.*s.^3./q(4).^2-3.*s.^2./q(4)+s)).*...
-        2.*s.^3/L.^3-s.^2./L.^2+s./L;
-    f4_s=@(s) -sin(q(1)./q(4).*s+q(2)./q(4).*(s.^2./q(4)-s)+q(3)./q(4).*(2.*s.^3./q(4).^2-3.*s.^2./q(4)+s)).*...
-        -s./L.^2.*(a1-a2+a3)-2.*s.^2./L.^3.*(a2-3*a3)-6.*s.^3./L.^4.*a3;
+    f1_s=@(s) -sin(phi_s(s)).* s./L;
+    f2_s=@(s) -sin(phi_s(s)).* s.^2./L.^2-s./L;
+    f3_s=@(s) -sin(phi_s(s)).* 2.*s.^3/L.^3-s.^2./L.^2+s./L;
+    f4_s=@(s) -sin(phi_s(s)).* -s./L.^2.*(a1-a2+a3)-2.*s.^2./L.^3.*(a2-3*a3)-6.*s.^3./L.^4.*a3;
     
-    f5_s=@(s) cos(q(1)./q(4).*s+q(2)./q(4).*(s.^2./q(4)-s)+q(3)./q(4).*(2.*s.^3./q(4).^2-3.*s.^2./q(4)+s)).*...
-        s./L;
-    f6_s=@(s) cos(q(1)./q(4).*s+q(2)./q(4).*(s.^2./q(4)-s)+q(3)./q(4).*(2.*s.^3./q(4).^2-3.*s.^2./q(4)+s)).*...
-        s.^2./L.^2-s./L;
-    f7_s=@(s) cos(q(1)./q(4).*s+q(2)./q(4).*(s.^2./q(4)-s)+q(3)./q(4).*(2.*s.^3./q(4).^2-3.*s.^2./q(4)+s)).*...
-        2.*s.^3./L.^3-s.^2./L.^2+s./L;
-    f8_s=@(s) cos(q(1)./q(4).*s+q(2)./q(4).*(s.^2./q(4)-s)+q(3)./q(4).*(2.*s.^3./q(4).^2-3.*s.^2./q(4)+s)).*...
-        -s./L.^2.*(a1-a2+a3)-2.*s.^2./L^3*(a2-3*a3)-6.*s.^3./L.^4.*a3;
+    f5_s=@(s) cos(phi_s(s)).* s./L;
+    f6_s=@(s) cos(phi_s(s)).* s.^2./L.^2-s./L;
+    f7_s=@(s) cos(phi_s(s)).* 2.*s.^3./L.^3-s.^2./L.^2+s./L;
+    f8_s=@(s) cos(phi_s(s)).* -s./L.^2.*(a1-a2+a3)-2.*s.^2./L^3*(a2-3*a3)-6.*s.^3./L.^4.*a3;
     
     
     Jc_c =@(c) ...
         [integral(f1_s,0,c.*L),...
         integral(f2_s,0,c.*L),...
         integral(f3_s,0,c.*L),...
-        cos_phi_s(c*L)*c+integral(f4_s,0,c.*L);...
+        cos(phi_s(c*L))*c+integral(f4_s,0,c.*L);...
         integral(f5_s,0,c.*L),...
         integral(f6_s,0,c.*L),...
         integral(f7_s,0,c.*L),...
-        sin_phi_s(c.*L)*c+integral(f8_s,0,c.*L)...
+        sin(phi_s(c.*L))*c+integral(f8_s,0,c.*L)...
         ];
     
     Fc_c =@(c) [...
-        sin_phi_s(c.*L);...
-        -cos_phi_s(c.*L)];
+        sin(phi_s(c.*L));...
+        -cos(phi_s(c.*L))];
     
     % some helpers
     %derivatives of the lagrange
@@ -91,7 +81,7 @@ function [c,ceq,DC,DCeq] = confungrad(x,q_des)
         Jc_sum=Jc_sum+Fc_vec(ii)*Jc_c(c_vec(ii).*L)'*Fc_c(c_vec(ii).*L);
     end
     %add the tip force
-    Jc_sum=Jc_sum+Na*Jc_c(L)'*[cos_phi_s(L);sin_phi_s(L)];
+    Jc_sum=Jc_sum+Na*Jc_c(L)'*[cos(phi_s(L));sin(phi_s(L))];
         
     c5=dLda1+Jc_sum(1,:)+Ma;
     c6=dLda2+Jc_sum(2,:);
