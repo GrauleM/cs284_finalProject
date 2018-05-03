@@ -1,5 +1,9 @@
 % x = [Na1,Na2,Fc1,Fc2,Fc3,c1,c2,c3,alpha1,alpha2,alpha3,L]
 
+%TODO: Add the final state to the cost function
+%TODO: See if changing tolerances does anything.
+
+
 q_des=[-.1,-.1,.3,1];
 
 %Params
@@ -45,8 +49,11 @@ x0(1:5)=x0(1:5).*E.*I;
 
 
 
-
+%Set simulation options
+%Tolerances: default = 1e-6
 options = optimoptions(@fmincon,'Algorithm','sqp','Display','iter');
+options = optimoptions(options,'ConstraintTolerance',1e-6,...
+                               'FunctionTolerance',1e-6);
 options = optimoptions(options,'SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',false);
 options = optimoptions(options,'MaxFunctionEvaluations',10000);
 
