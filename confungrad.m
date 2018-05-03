@@ -9,7 +9,7 @@ function [c,ceq,DC,DCeq] = confungrad(x,q_des,params)
     L0=params(4); %1cm
     E=params(5); %the Youngs modulus of silicone rubber is 0.05GPa
     I=params(6);
-   
+    Aeff=params(7);
     
     % desired actuator state
     q=x(9:12);
@@ -66,7 +66,7 @@ function [c,ceq,DC,DCeq] = confungrad(x,q_des,params)
     dLda1=-a1*E*I/L;%dL/dalpha1
     dLda2=-a2*E*I/(3*L);%dL/dalpha2
     dLda3=-a3*E*I/(5*L);%dL/dalpha3
-    dLdL=E*I/(2*L^2)*(a1^2+a2^2/3+a3^2/5)+(L0-L);
+    dLdL=E*I/(2*L^2)*(a1^2+a2^2/3+a3^2/5)+Aeff.*E*(L0-L);
     
     Jc_sum=zeros(4,1);
 
