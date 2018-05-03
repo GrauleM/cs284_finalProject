@@ -57,4 +57,5 @@ function [f,gradf] = objective_v3(x,endPose_des,params)
             ];
     end
 
+
 end
