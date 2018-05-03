@@ -1,21 +1,15 @@
-function [c,ceq,DC,DCeq] = confungrad(x,q_des)
+function [c,ceq,DC,DCeq] = confungrad(x,q_des,params)
 
     % x = [Na1,Na2,Fc1,Fc2,Fc3,c1,c2,c3,alpha1,alpha2,alpha3,L]
     
-    multiplication_factor=1;
-    phys_sln_multFactor=1;
-    
-    r_actuator=0.02; %actuator diameter in meter
-    I_actuator=1./4.*pi*r_actuator^4; %moment of inertia of actuator
-    A_actuator=pi.*r_actuator^2;
-    d=0.05; %distance from center (spine) to middle of actuator
+    multiplication_factor=params(1);
+    phys_sln_multFactor=params(2);
+    d=params(3); %distance from center (spine) to middle of actuator
 
-    L0=1; %1cm
-    E=0.05*10^9; %the Youngs modulus of silicone rubber is 0.05GPa
-    I=2.*(I_actuator+d^2.*A_actuator);
-    
-    E=1;
-    I=1;
+    L0=params(4); %1cm
+    E=params(5); %the Youngs modulus of silicone rubber is 0.05GPa
+    I=params(6);
+   
     
     % desired actuator state
     q=x(9:12);

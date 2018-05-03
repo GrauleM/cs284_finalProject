@@ -1,4 +1,4 @@
-function [f,gradf] = objfungrad(x)
+function [f,gradf] = objfungrad(x,params)
 
     % x = [Na1,Na2,Fc1,Fc2,Fc3,c1,c2,c3,alpha1,alpha2,alpha3,L]
     % setting the cost on state variables to zero here
