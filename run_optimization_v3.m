@@ -1,5 +1,5 @@
-% this version runs the optimization with the desired actuator
-% configuration as part of the cost to be optimized
+% this version runs the optimization with the desired 
+% END EFFECTOR POSE part of the cost to be optimized
 
 % x = [Na1,Na2,Fc1,Fc2,Fc3,c1,c2,c3,alpha1,alpha2,alpha3,L]
 
@@ -8,6 +8,8 @@
 
 
 q_des=[-.1,-.1,.5,1];
+endPose_des = [1,0.1,.4*pi];
+
 
 %Params
     %cost function multipliers
@@ -57,20 +59,24 @@ x0(1:5)=x0(1:5).*E.*I;
 options = optimoptions(@fmincon,'Algorithm','sqp','Display','iter');
 options = optimoptions(options,'ConstraintTolerance',1e-6,...
                                'FunctionTolerance',1e-6);
-options = optimoptions(options,'SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',false);
+options = optimoptions(options,'SpecifyObjectiveGradient',false,'SpecifyConstraintGradient',false);
 options = optimoptions(options,'MaxFunctionEvaluations',10000);
 
 lb = [ ]; ub = [ ];   % No upper or lower bounds
-[x,fval] = fmincon(@(x)objective_v2(x,q_des,params),x0,[],[],[],[],lb,ub,... 
+[x,fval] = fmincon(@(x)objective_v3(x,endPose_des,params),x0,[],[],[],[],lb,ub,... 
    @(x)constraints_v2(x,params),options);
 %%
+endPose_scaler=0.1;
 q_final=x(9:12);
 contacts=x(6:8);
 h1=figure(1);
 clf;
+hold on
 axis equal
-visualize_q(q_des,L0,h1,[1,0,0],'-');
+%visualize_q(q_des,L0,h1,[1,0,0],'-');
 %visualize_q_wContact(q_final,contacts,L0,h,[0,0,0],'--');
+visualize_endPose(endPose_des,h1,[0,0,0],endPose_scaler)
+visualize_endPose_from_q(q_final,L0,h1,[1,0,0],endPose_scaler);
 contactForces=x(3:5);
 forceScaler=.001;
 visualize_q_wContact_andContForces(q_final,contacts,contactForces,forceScaler,L0,h1,[0,0,0],'--');
@@ -78,7 +84,6 @@ visualize_q_wContact_andContForces(q_final,contacts,contactForces,forceScaler,L0
 
 h2=figure(2);
 clf;
-visualize_q(q_des,L0,h2,[1,0,0],'-');
 visualize_q_wContact(q_final,contacts,L0,h2,[0,0,0],'--');
 
 

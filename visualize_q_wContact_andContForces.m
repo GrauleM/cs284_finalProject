@@ -7,8 +7,9 @@ function visualize_q_wContact_andContForces(q,contacts,contactForces,forceScaler
     y_s=zeros(size(all_s));
 
     phi_s = @(s) q(1)./q(4).*s+q(2)./q(4).*(s.^2./q(4)-s)+q(3)./q(4).*(2.*s.^3./q(4).^2-3.*s.^2./q(4)+s);
-    cos_phi_s =@(s) cos(q(1)./q(4).*s+q(2)./q(4).*(s.^2./q(4)-s)+q(3)./q(4).*(2.*s.^3./q(4).^2-3.*s.^2./q(4)+s));  
-    sin_phi_s =@(s) sin(q(1)./q(4).*s+q(2)./q(4).*(s.^2./q(4)-s)+q(3)./q(4).*(2.*s.^3./q(4).^2-3.*s.^2./q(4)+s));  
+    
+    cos_phi_s =@(s) cos(phi_s(s));  
+    sin_phi_s =@(s) sin(phi_s(s));  
     
     xc_c = @(c) integral(cos_phi_s,0,c.*q(4));
     yc_c = @(c) integral(sin_phi_s,0,c.*q(4));

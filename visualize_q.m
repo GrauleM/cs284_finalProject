@@ -7,8 +7,8 @@ function visualize_q(q,L_0,figHandle,color,style)
     y_s=zeros(size(all_s));
 
     phi_s = @(s) q(1)./q(4).*s+q(2)./q(4).*(s.^2./q(4)-s)+q(3)./q(4).*(2.*s.^3./q(4).^2-3.*s.^2./q(4)+s);
-    cos_phi_s =@(s) cos(q(1)./q(4).*s+q(2)./q(4).*(s.^2./q(4)-s)+q(3)./q(4).*(2.*s.^3./q(4).^2-3.*s.^2./q(4)+s));  
-    sin_phi_s =@(s) sin(q(1)./q(4).*s+q(2)./q(4).*(s.^2./q(4)-s)+q(3)./q(4).*(2.*s.^3./q(4).^2-3.*s.^2./q(4)+s));  
+    cos_phi_s =@(s) cos(phi_s(s));  
+    sin_phi_s =@(s) sin(phi_s(s));  
 
     all_phi=phi_s(all_s);
     length(x_s);

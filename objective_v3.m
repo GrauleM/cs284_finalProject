@@ -1,4 +1,4 @@
-function [f,gradf] = objective_v2(x,q_des,params)
+function [f,gradf] = objective_v3(x,endPose_des,params)
     
     % this version of the objective function contains a cost on the
     % applied forces AND a cost on deviation from the desired configuration
@@ -7,9 +7,13 @@ function [f,gradf] = objective_v2(x,q_des,params)
     % x = [Na1,Na2,Fc1,Fc2,Fc3,c1,c2,c3,alpha1,alpha2,alpha3,L]
     % setting the cost on state variables to zero here
     
+    %CAREFUL: GRADIENT IS WRONG!
+    
+    q=x(9:12);
+    
     k1=.02;
     k2=.01;
-    k3=5000000;
+    k3=50000000;
     
     R=zeros(12);
     R(1,1)=k1;
@@ -18,9 +22,19 @@ function [f,gradf] = objective_v2(x,q_des,params)
     R(4,4)=k2;
     R(5,5)=k2;
     
-    Q=k3*eye(4);
-
-    deviation=x(9:12)-q_des;
+    Q=k3*eye(3);
+    
+    phi_s = @(s) q(1)./q(4).*s+q(2)./q(4).*(s.^2./q(4)-s)+q(3)./q(4).*(2.*s.^3./q(4).^2-3.*s.^2./q(4)+s);
+    
+    cos_phi_s =@(s) cos(phi_s(s));  
+    sin_phi_s =@(s) sin(phi_s(s));  
+    
+    %tip position
+    xt = integral(cos_phi_s,0,q(4));
+    yt = integral(sin_phi_s,0,q(4));
+    
+    endPose=[xt,yt,q(1)];
+    deviation=endPose-endPose_des;
     
     f=x*R*x'+deviation*Q*deviation';
     
@@ -37,7 +51,7 @@ function [f,gradf] = objective_v2(x,q_des,params)
             2*Q(1,1)*deviation(1),...
             2*Q(2,2)*deviation(2),...
             2*Q(3,3)*deviation(3),...
-            2*Q(4,4)*deviation(4),...
+            0 ...
             ];
     end
 
