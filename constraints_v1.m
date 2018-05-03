@@ -78,7 +78,7 @@ function [c,ceq,DC,DCeq] = constraints_v1(x,q_des,params)
         Jc_sum=Jc_sum+Fc_vec(ii)*Jc_c(c_vec(ii).*L)'*Fc_c(c_vec(ii).*L);
     end
     %add the tip force
-    Jc_sum=Jc_sum+Na*Jc_c(L)'*[cos(phi_s(L));sin(phi_s(L))];
+    Jc_sum=Jc_sum+Na*Jc_c(1.)'*[cos(phi_s(L));sin(phi_s(L))];
         
     c5=dLda1+Jc_sum(1,:)+Ma;
     c6=dLda2+Jc_sum(2,:);

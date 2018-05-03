@@ -22,7 +22,9 @@ function [f,gradf] = objective_v3(x,endPose_des,params)
     R(4,4)=k2;
     R(5,5)=k2;
     
-    Q=k3*eye(3);
+    Q=eye(3);
+    Q(1:2,1:2)=2*Q(1:2,1:2); % put higher cost on deviations in position
+    Q=k3*Q;
     
     phi_s = @(s) q(1)./q(4).*s+q(2)./q(4).*(s.^2./q(4)-s)+q(3)./q(4).*(2.*s.^3./q(4).^2-3.*s.^2./q(4)+s);
     

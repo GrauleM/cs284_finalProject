@@ -8,7 +8,7 @@
 
 
 q_des=[-.1,-.1,.5,1];
-endPose_des = [1,0.1,.4*pi];
+endPose_des = [1,-0.2,-.2*pi];
 
 
 %Params
@@ -44,7 +44,7 @@ endPose_des = [1,0.1,.4*pi];
 
 %Initialization of the guess
 L0=1; %unstretched length in m
-q0=[0,0,0,L0];
+q0=[0,0,0,1.2*L0];
 x0 = rand(1,12)./10;            % Starting guess 
 x0(12)=q0(4);
 x0(9:12)=q0;
