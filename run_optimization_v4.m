@@ -1,5 +1,7 @@
 % this version runs the optimization with the desired 
-% END EFFECTOR POSE part of the cost to be optimized
+% END EFFECTOR POSE as part of the cost to be optimized
+
+% V4 only allows for one contact forces
 
 % x = [Na1,Na2,Fc1,Fc2,Fc3,c1,c2,c3,alpha1,alpha2,alpha3,L]
 
@@ -60,8 +62,8 @@ options = optimoptions(options,'SpecifyObjectiveGradient',false,'SpecifyConstrai
 options = optimoptions(options,'MaxFunctionEvaluations',10000);
 
 lb = [ ]; ub = [ ];   % No upper or lower bounds
-[x,fval] = fmincon(@(x)objective_v3(x,endPose_des,params),x0,[],[],[],[],lb,ub,... 
-   @(x)constraints_v2(x,params),options);
+[x,fval] = fmincon(@(x)objective_v4(x,endPose_des,params),x0,[],[],[],[],lb,ub,... 
+   @(x)constraints_v4(x,params),options);
 %%
 endPose_scaler=0.1;
 q_final=x(9:12);

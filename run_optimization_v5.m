@@ -1,20 +1,27 @@
 % this version runs the optimization with the desired 
-% END EFFECTOR POSE part of the cost to be optimized
+% END EFFECTOR POSE as part of the cost to be optimized
+
+% V5 only allows for one contact forces which has to come FROM the obstacle
+
+
 
 % x = [Na1,Na2,Fc1,Fc2,Fc3,c1,c2,c3,alpha1,alpha2,alpha3,L]
+
+%obstacle obst=[x_obstacle,y_obstacle,r_obstacle]: obstacle position and radios
+obst=[.4,.05,.05];
 
 %TODO: Add the final state to the cost function
 %TODO: See if changing tolerances does anything.
 
 
 q_des=[-.1,-.1,.5,1];
-endPose_des = [.9,0.3,.2*pi];
+endPose_des = [.9,0.2,-.2*pi];
 
 
 %Params
     %cost function multipliers
     multiplication_factor=1;
-    phys_sln_multFactor=1;
+    phys_sln_multFactor=100000000;
     
     %Actuator stuff
     r_actuator=0.02; %actuator diameter in meter
@@ -47,6 +54,7 @@ x0(12)=q0(4);
 x0(9:12)=q0;
 x0(1:5)=x0(1:5).*E.*I;
 
+x0(6)=.5; %initialize contact point near middle
 
 
 
@@ -60,8 +68,8 @@ options = optimoptions(options,'SpecifyObjectiveGradient',false,'SpecifyConstrai
 options = optimoptions(options,'MaxFunctionEvaluations',10000);
 
 lb = [ ]; ub = [ ];   % No upper or lower bounds
-[x,fval] = fmincon(@(x)objective_v3(x,endPose_des,params),x0,[],[],[],[],lb,ub,... 
-   @(x)constraints_v2(x,params),options);
+[x,fval] = fmincon(@(x)objective_v5(x,endPose_des,params,obst),x0,[],[],[],[],lb,ub,... 
+   @(x)constraints_v5(x,params,obst),options);
 %%
 endPose_scaler=0.1;
 q_final=x(9:12);
@@ -78,6 +86,8 @@ contactForces=x(3:5);
 forceScaler=.001;
 visualize_q_wContact_andContForces(q_final,contacts,contactForces,forceScaler,L0,h1,[0,0,0],'--');
 
+%add the obstacle
+viscircles(obst(1:2),obst(3))
 
 h2=figure(2);
 clf;

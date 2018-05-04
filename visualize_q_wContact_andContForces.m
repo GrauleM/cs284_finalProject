@@ -26,9 +26,12 @@ function visualize_q_wContact_andContForces(q,contacts,contactForces,forceScaler
     
     for i=1:length(contacts)
         
+        foce_end=[xc_c(contacts(i))+forceScaler.*contactForces(i).*sin_phi_s(contacts(i).*q(4)),...
+            yc_c(contacts(i))-forceScaler.*contactForces(i).*cos_phi_s(contacts(i).*q(4))];
+        
         plot(xc_c(contacts(i)),yc_c(contacts(i)),'ro');
-  
-        line([xc_c(contacts(i)),xc_c(contacts(i))+forceScaler.*contactForces(i).*sin_phi_s(contacts(i).*q(4))],[yc_c(contacts(i)),yc_c(contacts(i))-forceScaler.*contactForces(i).*cos_phi_s(contacts(i).*q(4))]); % plot the contact force
+        plot(foce_end(1),foce_end(2),'d')
+        line([xc_c(contacts(i)),foce_end(1)],[yc_c(contacts(i)),foce_end(2)]); % plot the contact force
         text(1.05*xc_c(contacts(i)),1.05*yc_c(contacts(i)),num2str(i),'Color','r');
         
         
