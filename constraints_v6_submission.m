@@ -149,26 +149,5 @@ function [c,ceq,DC,DCeq] = constraints_v6(x,params,obst)
         c_length
     ];
     
-    % Gradient of the constraints:
-    if nargout > 2
-        DC= [zeros(1,5),-1.,zeros(1,6);...
-            zeros(1,5),1.,zeros(1,6);...
-            zeros(1,6),-1.,zeros(1,5);...
-            zeros(1,6),1.,zeros(1,5);...
-            zeros(1,7),-1.,zeros(1,4);...
-            zeros(1,7),1.,zeros(1,4)...
-            ];
-        DCeq = multiplication_factor.*[...
-%             zeros(1,8), -1., zeros(1,3);... %dc1/dx(i)
-%             zeros(1,9), -1.,zeros(1,2);... %dc2/dx(i)
-%             zeros(1,10), -1., 0;... %dc3/dx(i)
-%             zeros(1,11), -1.; ... %dc4/dx(i)
-            ; ... %dc5/dx(i)
-            ; ... %dc6/dx(i)
-            ; ... %dc7/dx(i)
-            ; ... %dc8/dx(i)            
-            ];
-    end
-
 
 end

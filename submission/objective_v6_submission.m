@@ -7,21 +7,14 @@ function [f,gradf] = objective_v6_submission(x,endPose_des,params,obst,cost_mult
     % x = [Na1,Na2,Fc1,Fc2,Fc3,c1,c2,c3,alpha1,alpha2,alpha3,L,comp_slack]
     % setting the cost on state variables to zero here
 
-    k1=.002;
-    k2=.00001;
-    k3_1=4;
-    k3_2=500000000;
-    k4=1000000;
-    k5=100000;
-    k6=100000;
     
-      k1=.002;
-    k2=.00001;
-    k3_1=4;
-    k3_2=500000000;
-    k4=1000000;
-    k5=100000;
-    k6=100000;
+    k1=cost_multipliers(1);
+    k2=cost_multipliers(2);
+    k3_1=cost_multipliers(3);
+    k3_2=cost_multipliers(4);
+    k4=cost_multipliers(5);
+    k5=cost_multipliers(6);
+    k6=cost_multipliers(7);
     
     
     q=x(9:12);
@@ -65,22 +58,5 @@ function [f,gradf] = objective_v6_submission(x,endPose_des,params,obst,cost_mult
     
     f=x*R*x'+deviation*Q*deviation'+Q_dist*dist_to_obst+k5*comp_slack-k6*x(3);
     
-    % Gradient of the objective function:
-    if nargout  > 1
-        gradf=[2*R(1,1)*x(1),...
-            2*R(2,2)*x(2),...
-            2*R(3,3)*x(3),...
-            2*R(4,4)*x(4),...
-            2*R(5,5)*x(5),...
-            2*R(6,6)*x(6),...
-            2*R(7,7)*x(7),...
-            2*R(8,8)*x(8),...
-            2*Q(1,1)*deviation(1),...
-            2*Q(2,2)*deviation(2),...
-            2*Q(3,3)*deviation(3),...
-            0 ...
-            ];
-    end
-
 
 end

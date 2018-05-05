@@ -8,7 +8,8 @@ function [c,ceq,DC,DCeq] = constraints_v6(x,params,obst)
     %external actuator forces are applied
     
     
-    % only allows for 1 contact force
+    % this version only allows for 1 contact force; the other contact forces Fc2, Fc3
+    % are forced to zero through constraints
     
     % x = [Na1,Na2,Fc1,Fc2,Fc3,c1,c2,c3,alpha1,alpha2,alpha3,L,comp_slack]
     
@@ -94,6 +95,9 @@ function [c,ceq,DC,DCeq] = constraints_v6(x,params,obst)
     cos_phi_s =@(s) cos(phi_s(s));  
     sin_phi_s =@(s) sin(phi_s(s));  
     
+    %define a function that computes the distance between the obstacle
+    %boundary and a point on the manipulator (defined by s, where s goes
+    %from 0 to L)
     dist_fn=@(s) -((integral(cos_phi_s,0,s.*q(4))-obst(1)).^2+(integral(sin_phi_s,0,s.*q(4))-obst(2)).^2)^.5+obst(3);
     
     xc = integral(cos_phi_s,0,c_vec(1).*q(4)); %position of contact point
@@ -127,7 +131,7 @@ function [c,ceq,DC,DCeq] = constraints_v6(x,params,obst)
         c_cont_obstDist, ...
         0.01*c_obstDist, ...
         c_force_direction,...
-        -comp_slack, ...
+        -comp_slack ...
         %c_force_positive
         ];
     
@@ -145,26 +149,5 @@ function [c,ceq,DC,DCeq] = constraints_v6(x,params,obst)
         c_length
     ];
     
-    % Gradient of the constraints:
-    if nargout > 2
-        DC= [zeros(1,5),-1.,zeros(1,6);...
-            zeros(1,5),1.,zeros(1,6);...
-            zeros(1,6),-1.,zeros(1,5);...
-            zeros(1,6),1.,zeros(1,5);...
-            zeros(1,7),-1.,zeros(1,4);...
-            zeros(1,7),1.,zeros(1,4)...
-            ];
-        DCeq = multiplication_factor.*[...
-%             zeros(1,8), -1., zeros(1,3);... %dc1/dx(i)
-%             zeros(1,9), -1.,zeros(1,2);... %dc2/dx(i)
-%             zeros(1,10), -1., 0;... %dc3/dx(i)
-%             zeros(1,11), -1.; ... %dc4/dx(i)
-            ; ... %dc5/dx(i)
-            ; ... %dc6/dx(i)
-            ; ... %dc7/dx(i)
-            ; ... %dc8/dx(i)            
-            ];
-    end
-
 
 end
