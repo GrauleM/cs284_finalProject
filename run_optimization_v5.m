@@ -8,14 +8,14 @@
 % x = [Na1,Na2,Fc1,Fc2,Fc3,c1,c2,c3,alpha1,alpha2,alpha3,L]
 
 %obstacle obst=[x_obstacle,y_obstacle,r_obstacle]: obstacle position and radios
-obst=[.4,.05,.05];
+obst=[.45,.05,.05];
 
 %TODO: Add the final state to the cost function
 %TODO: See if changing tolerances does anything.
 
 
 q_des=[-.1,-.1,.5,1];
-endPose_des = [.9,0.2,-.2*pi];
+endPose_des = [.9,0.2,.1*pi];
 
 
 %Params

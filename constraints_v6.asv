@@ -1,11 +1,16 @@
-function [c,ceq,DC,DCeq] = constraints_v5(x,params,obst)
+function [c,ceq,DC,DCeq] = constraints_v6(x,params,obst)
 
     % this version of the constraint function includes constraints on physicality (equilibrium)
     % only
     
+    %this version treats the computation of L differently: L is directly
+    %computed from steady state solution given actuator forces. then no
+    %external actuator forces are applied
+    
+    
     % only allows for 1 contact force
     
-    % x = [Na1,Na2,Fc1,Fc2,Fc3,c1,c2,c3,alpha1,alpha2,alpha3,L]
+    % x = [Na1,Na2,Fc1,Fc2,Fc3,c1,c2,c3,alpha1,alpha2,alpha3,L,comp_slack]
     
     multiplication_factor=params(1);
     phys_sln_multFactor=params(2);
@@ -22,7 +27,7 @@ function [c,ceq,DC,DCeq] = constraints_v5(x,params,obst)
     a2=q(2);
     a3=q(3);
     L=q(4);
-    
+    comp_slack=x(13);
 
     %[a1,a2,a3,L]=q(1,1:4);
     c_vec=x(6:8);
@@ -34,80 +39,55 @@ function [c,ceq,DC,DCeq] = constraints_v5(x,params,obst)
     %note: s from 0 to L
     phi_s = @(s) q(1)./q(4).*s+q(2)./q(4).*(s.^2./q(4)-s)+q(3)./q(4).*(2.*s.^3./q(4).^2-3.*s.^2./q(4)+s); %CHECKED
     
-    dphidalpha1_s = @(s) s./L; %CHECKED
-    dphidalpha2_s = @(s) s^2./L^2-s/L;  %CHECKED
-    dphidalpha3_s = @(s) 2*s^3/L^3-3.*s^2./L^2+s/L; %FIXED
-    dphidL_s = @(s) -s./L^2*(a1-a2+a3)-2*s^2/L^3*(a2-3*a3)-6*s^3/L^4*a3; %CHECKED
-    
     %integrand for gradients of xc and yc with respect to elements of q as functions of s
     f1_s=@(s) -sin(phi_s(s)).* s./L;
     f2_s=@(s) -sin(phi_s(s)).* s.^2./L.^2-s./L;
     f3_s=@(s) -sin(phi_s(s)).* 2.*s.^3/L.^3-s.^2./L.^2+s./L;
-    f4_s=@(s) -sin(phi_s(s)).* -s./L.^2.*(a1-a2+a3)-2.*s.^2./L.^3.*(a2-3*a3)-6.*s.^3./L.^4.*a3;
     
     f5_s=@(s) cos(phi_s(s)).* s./L;
     f6_s=@(s) cos(phi_s(s)).* s.^2./L.^2-s./L;
     f7_s=@(s) cos(phi_s(s)).* 2.*s.^3./L.^3-s.^2./L.^2+s./L;
-    f8_s=@(s) cos(phi_s(s)).* -s./L.^2.*(a1-a2+a3)-2.*s.^2./L^3*(a2-3*a3)-6.*s.^3./L.^4.*a3;
     
-    
-    Jc_c =@(c) ...
+    % function to compute the jacobian at contact point c (c between 0 and
+    % 1)
+    Jc_c =@(c) ... 
         [integral(f1_s,0,c.*L),...
         integral(f2_s,0,c.*L),...
-        integral(f3_s,0,c.*L),...
-        cos(phi_s(c*L))*c+integral(f4_s,0,c.*L);...
+        integral(f3_s,0,c.*L);...
         integral(f5_s,0,c.*L),...
         integral(f6_s,0,c.*L),...
-        integral(f7_s,0,c.*L),...
-        sin(phi_s(c.*L))*c+integral(f8_s,0,c.*L)...
+        integral(f7_s,0,c.*L)...
         ];
     
+    %direction of contact force at contact point defined by c
     Fc_c =@(c) [...
         sin(phi_s(c.*L));...
         -cos(phi_s(c.*L))];
     
-    % some helpers
-    %derivatives of the lagrange
+    %derivatives of the lagrange term
     dLda1=-a1*E*I/L;%dL/dalpha1
     dLda2=-a2*E*I/(3*L);%dL/dalpha2
     dLda3=-a3*E*I/(5*L);%dL/dalpha3
-    dLdL=E*I/(2*L^2)*(a1^2+a2^2/3+a3^2/5)+Aeff.*E*(L0-L);
     
-    Jc_sum=zeros(4,1);
+    Jc_sum=zeros(3,1);
 
+    %for each external force, compute the generalized force (w jacobian)
+    %and add it to the constraint function (g_e(q) in report)
     for ii=1:length(c_vec)
-        
         Jc_sum=Jc_sum+Fc_vec(ii)*Jc_c(c_vec(ii).*L)'*Fc_c(c_vec(ii).*L);
     end
-    %add the tip force
-    Jc_sum=Jc_sum+Na*Jc_c(1.)'*[cos(phi_s(L));sin(phi_s(L))];
-        
-    c5=dLda1+Jc_sum(1,:)+Ma;
+
+    %constraints for equilibrium
+    c5=dLda1+Jc_sum(1,:)+Ma;%add the tip moment  
     c6=dLda2+Jc_sum(2,:);
     c7=dLda3+Jc_sum(3,:);
-    c8=dLdL+Jc_sum(4,:);
     
-    % Inequality constraints
-    c=[-x(6),...
-        x(6)-1,...
-        -x(7),...
-        x(7)-1,...
-        -x(8),...
-        x(8)-1,...
-        ];
-    
-%     final_pos_equalityConstraints=...
-%         [q_des(1)-q(1),...    %c1
-%         q_des(2)-q(2),...      %c2
-%         q_des(3)-q(3),...       %c3
-%         q_des(4)-q(4)];
     final_pos_equalityConstraints=[];
    
     physical_sln_equalityConstraints=...
         [c5,...
         c6,...
-        c7,...
-        c8...
+        c7...
         ];
    
     %distance between contact point 1 and obstacle boundary has to be zero
@@ -123,42 +103,46 @@ function [c,ceq,DC,DCeq] = constraints_v5(x,params,obst)
     
     c_cont_obstDist=-(dist_to_obst-obst(3)); %for contact point, distance to obstacle has to be larger than obstacle radius r_o, or: -(dist)+r<=0
     
-    c_complementary=0.01*c_cont_obstDist*x(3); %forces can only occur when contact with obstacle is given; c_comp has to be zero
+    c_complementary=c_cont_obstDist*x(3)-comp_slack; %forces can only occur when contact with obstacle is given; c_comp has to be zero
     
     %contact forces have to point in opposite direction of the vector from
     %obst center to contact point
-    
-    c_force_direction=([xc,yc]-[obst(1),obst(2)])*Fc_c(c_vec(1).*L)*Fc_vec(1);
+    c_force_direction=-([xc,yc]-[obst(1),obst(2)])*Fc_c(c_vec(1).*L)*sign(Fc_vec(1));
     
     s_obst_check=0:0.05:1;
     c_obstDist=zeros(size(s_obst_check));
     for j=1:length(s_obst_check)
-        c_obstDist(j)=dist_fn(s_obst_check(j)); %other points on the manipulator also have to be outside the obstacle - check a bunch of points
+        c_obstDist(j)=dist_fn(s_obst_check(j)); %other points on the manipulator also have to be outside the obstacle - check this for a bunch of points
     end
     
     %add one more constraint saying that contact forces have to be positive
     
     % Inequality constraints
-    c=[-x(6),...
-        x(6)-1,...
-        -x(7),...
-        x(7)-1,...
-        -x(8),...
-        x(8)-1,...
+    c=[-x(6),... %ensuring that the contact point is on the manipulator
+        x(6)-1,...%ensuring that the contact point is on the manipulator
+        -x(7),...%ensuring that the contact point is on the manipulator
+        x(7)-1,...%ensuring that the contact point is on the manipulator
+        -x(8),...%ensuring that the contact point is on the manipulator
+        x(8)-1,...%ensuring that the contact point is on the manipulator
         c_cont_obstDist, ...
         0.01*c_obstDist, ...
-        c_force_direction...
+        c_force_direction,...
+        -comp_slack, ...
+        %c_force_positive
         ];
     
     % constraints to force FC2,2 and c2,3 to be zero
     zero_Fc_constraints=[x(4),x(5),x(7),x(8)];
 
+    %length constraint:
+    c_length=L-L0-Na./(Aeff.*E);
     
     % Nonlinear equality constraints
     ceq=multiplication_factor.*[final_pos_equalityConstraints,...
         phys_sln_multFactor.*physical_sln_equalityConstraints,...
         zero_Fc_constraints, ...
-        c_complementary
+        c_complementary,...
+        c_length
     ];
     
     % Gradient of the constraints:

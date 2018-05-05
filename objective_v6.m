@@ -1,22 +1,23 @@
-function [f,gradf] = objective_v5(x,endPose_des,params,obst)
+function [f,gradf] = objective_v6(x,endPose_des,params,obst)
     
     % this version of the objective function contains a cost on the
     % applied forces AND a cost on deviation from the desired configuration
     % in generalized coordinates
     
-    % x = [Na1,Na2,Fc1,Fc2,Fc3,c1,c2,c3,alpha1,alpha2,alpha3,L]
+    % x = [Na1,Na2,Fc1,Fc2,Fc3,c1,c2,c3,alpha1,alpha2,alpha3,L,comp_slack]
     % setting the cost on state variables to zero here
     
     %CAREFUL: GRADIENT IS WRONG!
     
     q=x(9:12);
-        c_vec=x(6:8);
+    c_vec=x(6:8);
 
     k1=.002;
-    k2=.0001;
+    k2=.00001;
     k3=500000000;
-    
-    R=zeros(12);
+    k4=100000;
+    comp_slack=x(13);
+    R=zeros(13);
     R(1,1)=k1;
     R(2,2)=k1;
     R(3,3)=k2;
@@ -24,10 +25,10 @@ function [f,gradf] = objective_v5(x,endPose_des,params,obst)
     R(5,5)=k2;
     
     Q=eye(3);
-    Q(1:2,1:2)=2*Q(1:2,1:2); % put higher cost on deviations in position
+    Q(1:2,1:2)=4*Q(1:2,1:2); % put higher cost on deviations in position
     Q=k3*Q;
     
-    Q_dist=100000.;
+    Q_dist=1000000.;
     
     
     phi_s = @(s) q(1)./q(4).*s+q(2)./q(4).*(s.^2./q(4)-s)+q(3)./q(4).*(2.*s.^3./q(4).^2-3.*s.^2./q(4)+s);
@@ -51,7 +52,7 @@ function [f,gradf] = objective_v5(x,endPose_des,params,obst)
     dist_to_obst=((obst(1)-xc).^2+(obst(2)-yc).^2).^0.5;
     
     
-    f=x*R*x'+deviation*Q*deviation'+Q_dist*dist_to_obst;
+    f=x*R*x'+deviation*Q*deviation'+Q_dist*dist_to_obst+k4*comp_slack-100000*x(3);
     
     % Gradient of the objective function:
     if nargout  > 1
