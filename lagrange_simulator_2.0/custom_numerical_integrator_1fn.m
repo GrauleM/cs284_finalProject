@@ -1,4 +1,4 @@
-function out=numerical_integrator(fun,q,qdot,qddot,L)
+function out=custom_numerical_integrator_1fn(fun,q,qdot,qddot,L)
 % using Gauss-Legendre Quadrature to integrare the function f(s_hat) (supplied as
 % function handle fun) twice.
 
@@ -18,12 +18,15 @@ wi_i=[0.568889,0.478629,0.478629,0.236927,0.236927];
 xi_o=xi_i;
 wi_o=wi_i;
 
-out=0
+out=0;
 
 for j=1:len(wi_o)
+    inner_sum=0;
     for i=1:len(wi_o)
-        out=out+(xi_o(j)+1)*wi_o(j)*wi_i(i)*fun(L*(xi_o(j)+1)*(xi_i(i)+1)/4,q,qdot,qddot);
+        summand=wi_i(i)*fun(L*(xi_o(j)+1)*(xi_i(i)+1)/4,q,qdot,qddot);
+        inner_sum=inner_sum+summand;
     end
+    out=out+(xi_o(j)+1)*wi_o(j)*inner_sum;
 end
 
 out=out*L^2/8;
