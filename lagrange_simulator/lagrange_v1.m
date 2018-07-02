@@ -25,7 +25,7 @@ M=[1,1,1,1];
 % syms a1_dt a2_dt a3_dt 
 % syms a1_dtt a2_dtt a3_dtt 
 
-a1=0; a2=0; a3=0;
+a1=.2; a2=1; a3=-5.;
 a1_dt=0; a2_dt=0; a3_dt=0; 
 a1_dtt=0; a2_dtt=0; a3_dtt =0;
 

@@ -1,11 +1,11 @@
 % run lagrange optimization
 
-nr_timesteps=10;
+nr_timesteps=6;
 
 params=nr_timesteps;
 
 Ma_des=zeros(nr_timesteps,1);
-Ma_des(5:end)=Ma_des(5:end)+10;
+Ma_des(3:end)=Ma_des(3:end)+10;
 
 x0=zeros(1,(3*3+1)*nr_timesteps);
 

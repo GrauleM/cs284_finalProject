@@ -54,9 +54,9 @@ x_s = int(cos(phi_s),s,[0,s_hat]);
 y_s = int(sin(phi_s),s,[0,s_hat]);
 
 %note: how to evaluate an integral of x_s
-int_xs=int(x_s,s_hat,[0,1])
-numerical_value= vpa(int_xs)
-%note end
+% int_xs=int(x_s,s_hat,[0,1])
+% numerical_value= vpa(int_xs)
+% note end
 
 % 1st order time derivative of these
 x_dt_s = int(-sin(phi_s).*phi_dt_s,s,[0,s_hat]);
@@ -152,9 +152,9 @@ for i=1:N
     y_cmi_dt_da3(i)=1./(L./N).*int(y_dt_da3_s,s_hat,[(i-1).*(L./N),i.*(L./N)]);
 
     % derivatives of COM velocities with respect to ai_dt
-    x_cmi_dt_da1dt(i)=1./(L./N).*int(x_dt_da1dt_s,s_hat,[(i-1).*(L./N),i.*(L./N)]);
-	x_cmi_dt_da2dt(i)=1./(L./N).*int(x_dt_da2dt_s,s_hat,[(i-1).*(L./N),i.*(L./N)]);
-    x_cmi_dt_da3dt(i)=1./(L./N).*int(x_dt_da3dt_s,s_hat,[(i-1).*(L./N),i.*(L./N)]);
+    x_cmi_dt_da1dt(i)=1./(L./N).*vpa(int(x_dt_da1dt_s,s_hat,[(i-1).*(L./N),i.*(L./N)]));
+	x_cmi_dt_da2dt(i)=1./(L./N).*vpa(int(x_dt_da2dt_s,s_hat,[(i-1).*(L./N),i.*(L./N)]));
+    x_cmi_dt_da3dt(i)=1./(L./N).*vpa(int(x_dt_da3dt_s,s_hat,[(i-1).*(L./N),i.*(L./N)])); %this line failed with and without vpa
 
     y_cmi_dt_da1dt(i)=1./(L./N).*int(y_dt_da1dt_s,s_hat,[(i-1).*(L./N),i.*(L./N)]);
 	y_cmi_dt_da2dt(i)=1./(L./N).*int(y_dt_da2dt_s,s_hat,[(i-1).*(L./N),i.*(L./N)]);
