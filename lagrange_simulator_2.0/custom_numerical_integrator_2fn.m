@@ -24,7 +24,7 @@ for j=1:length(wi_o)
     inner_sum1=0;
     inner_sum2=0;
 
-    for i=1:lenght(wi_o)
+    for i=1:length(wi_o)
         summand=wi_i(i)*fun1(L*(xi_o(j)+1)*(xi_i(i)+1)/4,q,qdot,qddot);
         inner_sum1=inner_sum1+summand;
     end
