@@ -1,4 +1,4 @@
-%function c=compute_lagrange_constraints(q,qdot,qddot,params)
+%function ceq=compute_lagrange_constraints(q,qdot,qddot,params)
 
 %L=params(1);
 L=1;
@@ -7,6 +7,13 @@ E=1; I=1; rho=1; g=1;
 q_val=[1;1;1];
 qdot_val=[0;1;0];
 qddot_val=[1;0;0];
+
+%tip moment Ma
+Ma=1;
+
+%contact force magnitudes 
+Fc_mags=[1,0,0];
+
 
 %phi(s),phidot(s) and phiddot(s)
 phi     =@(s,q)     q(1)*s/L+q(2)*(s^2/L^2-s/L)+q(3)*(2*s^3/L^3-3*s^2/L^2+s/L);
@@ -28,7 +35,8 @@ phiddot_dqddot=@(s,qddot)   [s/L;...
 % these functions need to be integrated from 0 to s to get x(s) and y(s)        
 x_helper=@(s,q,qdot,qddot)          cos(phi(s,q));
 y_helper=@(s,q,qdot,qddot)          sin(phi(s,q));
-% this function needs to be integrated from 0 to s to get dy(s)/dq        
+% this function needs to be integrated from 0 to s to get dx(s)/dq and dy(s)/dq        
+x_dq_helper=@(s,q,qdot,qddot)       -sin(phi(s,q))*phi_dq(s,q);   
 y_dq_helper=@(s,q,qdot,qddot)       cos(phi(s,q))*phi_dq(s,q);   
 % these functions need to be integrated from 0 to s to get xdot(s) and ydot(s)        
 xdot_helper=@(s,q,qdot,qddot)       -sin(phi(s,q))*phidot(s,qdot);
@@ -119,17 +127,41 @@ Vg_dq=@(q,qdot,qddot) ...
            q,qdot,qddot,L)...
     ;     
 
-%Lagrange constraints with NEITHER external contact forces NOR actuatior
-%moments (has to equal 0)
+% terms from external contact forces
 
-c=@(q,qdot,qddot) ...
+% J_sc: jacobian associated with point at arch length sc (sc: s_contact)
+% c ranges from 0 to 1; sc=c*L
+J_sc_transpose=@(c,L,q,qdot,qddot) ...
+               [ custom_numerical_integrator_1fn(x_dq_helper,q,qdot,qddot,c.*L),...
+                 custom_numerical_integrator_1fn(y_dq_helper,q,qdot,qddot,c.*L)];
+
+%test
+J_sc_transpose(0.5,L,q_val,qdot_val,qddot_val)
+
+% directional contact forces (xx important: this assumes contact forces are
+% normal to the backbone!)
+% at contact point defined by sc
+Fc_direction_sc =@(c,L,q) [...
+        sin(phi(c.*L,q));...
+        -cos(phi(c.*L),q)];
+
+% sum accross all contact forces
+generalized_extForces_sum=0;
+for ii=1:length(c_vec)
+        generalized_extForces_sum=generalized_extForces_sum+Fc_mags(ii)*J_sc_transpose(c,L,q,qdot,qddot)*Fc_direction_sc(c,L,q);
+end
+
+%Lagrangian constraints with NEITHER external contact forces NOR actuatior
+%moments (has to be equal to 0)
+
+ceq_lagrangian=@(q,qdot,qddot) ...    %note: this function definition step can be skipped
     Tkin_dqdot_dt(q,qdot,qddot)...
     -Tkin_dq(q,qdot,qddot)...
     +Vc_dq(q,qdot,qddot)...
     +Vg_dq(q,qdot,qddot);
 
 
-result=c(q_val,qdot_val,qddot_val)
 
-%xx TODO: needs to be tested/debugged - doesnt work with gravity =0 rn
+ceq=ceq_lagrangian(q_val,qdot_val,qddot_val)
+
 %end
