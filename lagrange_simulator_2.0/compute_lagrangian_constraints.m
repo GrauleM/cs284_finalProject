@@ -1,18 +1,38 @@
-%function ceq=compute_lagrange_constraints(q,qdot,qddot,params)
+function ceq=compute_lagrangian_constraints(forces,q_val,qdot_val,qddot_val,params)
 
-%L=params(1);
-L=1;
-E=1; I=1; rho=1; g=1;
+%note: functions are defined as functions of the variables q,qdot,qddot.
+%the functions need to be evaluated at the given 'values' for these
+%variables, which are passed into the function as q_val,qdot_val,qddot_val
 
-q_val=[1;1;1];
-qdot_val=[0;1;0];
-qddot_val=[1;0;0];
+% reminder: params is defined as follows: 
+%   params=[ d,L0,E,I,Aeff,rho_line,g]; 
+L=params(2);
+E=params(3);
+I=params(4);
+rho=params(6); %xx consider to make this rho per area along the line. if so, remember changing the functions below
+g=params(7);
 
-%tip moment Ma
-Ma=1;
+% for debugging xx remove
+% q_val=[1;1;1];
+% qdot_val=[0;1;0];
+% qddot_val=[1;0;0];
 
-%contact force magnitudes 
-Fc_mags=[1,0,0];
+% the vector 'forces' contains the tip moment Ma, the N contact force
+% magnitudes, and the N contact points as follows:
+% forces=[Ma,Fc_mag1,...,Fc_magN,c_point1,...c_pointN]
+Ma=forces(1); %tip moment Ma
+
+if length(forces)<2
+    disp("ERROR: specify at least one pair of contact force and contact point. specify F_c=0 if no contact force is desired")
+else
+    N_contact= (length(forces)-1)/2; %number of contact forces 
+    Fc_mags=forces(2:N_contact+1); %contact force magnitudes 
+    c_points=forces(N_contact+2:end); %contact points
+end
+
+% xx note on efficiency: it may be a waste of time to define all these
+% functions as 'anonymous functions' every time this code is executed. may
+% be better to define them in their own files to be always available.
 
 
 %phi(s),phidot(s) and phiddot(s)
@@ -127,7 +147,8 @@ Vg_dq=@(q,qdot,qddot) ...
            q,qdot,qddot,L)...
     ;     
 
-% terms from external contact forces
+% include external contact forces (using Jacobian to map them to
+% generalized coordinates)
 
 % J_sc: jacobian associated with point at arch length sc (sc: s_contact)
 % c ranges from 0 to 1; sc=c*L
@@ -135,33 +156,33 @@ J_sc_transpose=@(c,L,q,qdot,qddot) ...
                [ custom_numerical_integrator_1fn(x_dq_helper,q,qdot,qddot,c.*L),...
                  custom_numerical_integrator_1fn(y_dq_helper,q,qdot,qddot,c.*L)];
 
-%test
-J_sc_transpose(0.5,L,q_val,qdot_val,qddot_val)
-
 % directional contact forces (xx important: this assumes contact forces are
 % normal to the backbone!)
 % at contact point defined by sc
 Fc_direction_sc =@(c,L,q) [...
         sin(phi(c.*L,q));...
-        -cos(phi(c.*L),q)];
-
+        -cos(phi(c.*L,q))];
+    
 % sum accross all contact forces
 generalized_extForces_sum=0;
-for ii=1:length(c_vec)
-        generalized_extForces_sum=generalized_extForces_sum+Fc_mags(ii)*J_sc_transpose(c,L,q,qdot,qddot)*Fc_direction_sc(c,L,q);
+for ii=1:length(c_points)
+        c=c_points(ii);
+        generalized_extForces_sum=generalized_extForces_sum+Fc_mags(ii)*J_sc_transpose(c,L,q_val,qdot_val,qddot_val)*Fc_direction_sc(c,L,q_val);
 end
 
-%Lagrangian constraints with NEITHER external contact forces NOR actuatior
+%Lagrangian constraints with NEITHER external contact forces NOR actuator
 %moments (has to be equal to 0)
 
 ceq_lagrangian=@(q,qdot,qddot) ...    %note: this function definition step can be skipped
-    Tkin_dqdot_dt(q,qdot,qddot)...
-    -Tkin_dq(q,qdot,qddot)...
-    +Vc_dq(q,qdot,qddot)...
-    +Vg_dq(q,qdot,qddot);
+      Tkin_dqdot_dt(q,qdot,qddot)...
+    - Tkin_dq(q,qdot,qddot)...
+    + Vc_dq(q,qdot,qddot)...
+    + Vg_dq(q,qdot,qddot)...
+    + [Ma;0;0]...                  %add effect of actuator moment at the tip
+    + generalized_extForces_sum;   %add contribution of external forces
 
 
 
 ceq=ceq_lagrangian(q_val,qdot_val,qddot_val)
 
-%end
+end
