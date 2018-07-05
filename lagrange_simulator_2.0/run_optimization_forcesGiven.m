@@ -10,12 +10,14 @@
 % using zero contact forces. note: always specify at least one pair of 
 % contact force and contact point. specify F_c=0 if no contact force is desired
 
+%constraint multiplier to achieve higher accuracy in constraints
+constraint_multiplier=10000;
 
 % Desired force profile over time
-Ma_step=1;
-% each column in desired_forces_timeSeries is one point in time of the form
+Ma_step=5.;
+% each column in desired_forces is one point in time of the form
 % [Ma;forces;contact_points];
-desired_forces_timeSeries=transpose(...
+desired_forces=transpose(...
     [0,0,0;...
      0,0,0;...
      0,0,0;...
@@ -29,15 +31,23 @@ desired_forces_timeSeries=transpose(...
     ]...
     );
 
-N_timePoints = size(desired_forces_timeSeries,2);%number of time points;
+N_timePoints = size(desired_forces,2);%number of time points;
+
 
 % Resulting configuration over time with the given force profile. This will
 % be optimized
 % each column in resulting_states_timeSeries is one point in time of the form
 % [q;qdot;qddot] %xx remove qddot?
 
-resulting_states_timeSeries=(rand(3*3,N_timePoints)-0.5)/10;
+%decision variables: q and qdot, integration step h
+resulting_states_timeSeries0=(rand(2*3,N_timePoints)-0.5)/10;
 
+h0=.1;
+
+%bundle decision variables
+% x= [h;0;0...., desired_forces]
+h_vec=[h0;zeros(size(resulting_states_timeSeries0,1)-1,1)];
+x0=[h_vec,resulting_states_timeSeries0];
 
 %Params
     %Actuator geometries
@@ -67,3 +77,42 @@ resulting_states_timeSeries=(rand(3*3,N_timePoints)-0.5)/10;
              Aeff,...
              rho_line,...
              g];
+
+% finally run the optimization
+options = optimoptions(@fmincon,'Algorithm','sqp','Display','iter');
+options = optimoptions(options,'ConstraintTolerance',1e-6,...
+                               'FunctionTolerance',1e-6);
+options = optimoptions(options,'SpecifyObjectiveGradient',false,'SpecifyConstraintGradient',false);
+options = optimoptions(options,'MaxFunctionEvaluations',10000);
+
+lb = [ ]; ub = [ ];   % No upper or lower bounds
+[x,fval] = fmincon(...
+    @(x) objective_timeSeriesSimulator(x,params),...
+    x0,[],[],[],[],lb,ub,... 
+    @(x)all_constraints_timeSeriesSimulator(x,desired_forces,params,constraint_multiplier),...
+    options);
+
+
+%% plot those states
+close all;
+resulting_states_timeSeries_final=x(:,2:end);
+
+h1=figure(1);
+clf;
+axis equal;
+hold on;
+base_color=[1,1,1];
+
+for t=1:N_timePoints
+    color=[1,1,1]-(t/N_timePoints)*base_color;
+    q = resulting_states_timeSeries_final(1:3,t);
+    visualize_q(q,L0,h1,color,'-')
+end
+xl=xlim;
+yl=ylim;
+% use these axis limits for the following plots
+
+
+% 
+h2=figure(2);
+visualize_q_timeSeries(resulting_states_timeSeries_final(1:3,:),L0,h2,[0,0,0],'-',xl,yl)

@@ -183,6 +183,6 @@ ceq_lagrangian=@(q,qdot,qddot) ...    %note: this function definition step can b
 
 
 
-ceq=ceq_lagrangian(q_val,qdot_val,qddot_val)
+ceq=ceq_lagrangian(q_val,qdot_val,qddot_val);
 
 end
