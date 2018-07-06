@@ -14,7 +14,8 @@
 constraint_multiplier=10000;
 
 % Desired force profile over time
-Ma_step=5.;
+Ma_step=0.;
+
 % each column in desired_forces is one point in time of the form
 % [Ma;forces;contact_points];
 desired_forces=transpose(...
@@ -39,15 +40,18 @@ N_timePoints = size(desired_forces,2);%number of time points;
 % each column in resulting_states_timeSeries is one point in time of the form
 % [q;qdot;qddot] %xx remove qddot?
 
-%decision variables: q and qdot, integration step h
+%decision variables: q and qdot
 resulting_states_timeSeries0=(rand(2*3,N_timePoints)-0.5)/10;
 
-h0=.1;
+h0=.01;
 
-%bundle decision variables
-% x= [h;0;0...., desired_forces]
-h_vec=[h0;zeros(size(resulting_states_timeSeries0,1)-1,1)];
-x0=[h_vec,resulting_states_timeSeries0];
+% %bundle decision variables for cases where h is a decision variable (e.g.
+% %when looking to achieve final desired tip position)
+% % x= [h;0;0...., desired_forces]
+% h_vec=[h0;zeros(size(resulting_states_timeSeries0,1)-1,1)];
+% x0=[h_vec,resulting_states_timeSeries0];
+
+x0=[resulting_states_timeSeries0];
 
 %Params
     %Actuator geometries
@@ -89,13 +93,13 @@ lb = [ ]; ub = [ ];   % No upper or lower bounds
 [x,fval] = fmincon(...
     @(x) objective_timeSeriesSimulator(x,params),...
     x0,[],[],[],[],lb,ub,... 
-    @(x)all_constraints_timeSeriesSimulator(x,desired_forces,params,constraint_multiplier),...
+    @(x)all_constraints_timeSeriesSimulator(x,desired_forces,params,constraint_multiplier,h0),...
     options);
 
 
 %% plot those states
 close all;
-resulting_states_timeSeries_final=x(:,2:end);
+resulting_states_timeSeries_final=x;
 
 h1=figure(1);
 clf;

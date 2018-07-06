@@ -7,10 +7,6 @@ function [f,gradf] = objective_timeSeriesSimulator(x,params)
 % objective: minimize h; this means to get stable as fast as possible. not
 % sure this is the ideal objective
 
-h=x(1,1);
-f=h;
 f=0;
-
-
 
 end
