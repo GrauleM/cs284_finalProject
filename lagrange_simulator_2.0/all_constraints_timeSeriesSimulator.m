@@ -47,11 +47,11 @@ ceq=[ceq;qdot;qddot];
 
 %add an equality constraint to ensure that start velocity and accelerations
 %are zero (equilibrium at the start)
-    q0      = resulting_states_timeSeries(1:3,t);
-    qdot0   = resulting_states_timeSeries(4:6,t);
+    q0      = resulting_states_timeSeries(1:3,1);
+    qdot0   = resulting_states_timeSeries(4:6,1);
 
-    q1      = resulting_states_timeSeries(1:3,t+1);
-    qdot1   = resulting_states_timeSeries(4:6,t+1);
+    q1      = resulting_states_timeSeries(1:3,2);
+    qdot1   = resulting_states_timeSeries(4:6,2);
     %midpoints
     q       = 1/2*(q0+q1);
     qdot    = 1/2*(qdot0+qdot1);

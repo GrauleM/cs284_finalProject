@@ -11,10 +11,10 @@
 % contact force and contact point. specify F_c=0 if no contact force is desired
 
 %constraint multiplier to achieve higher accuracy in constraints
-constraint_multiplier=10000;
+constraint_multiplier=100000000;
 
 % Desired force profile over time
-Ma_step=0.;
+Ma_step=-5.;
 
 % each column in desired_forces is one point in time of the form
 % [Ma;forces;contact_points];
@@ -42,8 +42,10 @@ N_timePoints = size(desired_forces,2);%number of time points;
 
 %decision variables: q and qdot
 resulting_states_timeSeries0=(rand(2*3,N_timePoints)-0.5)/10;
+%resulting_states_timeSeries0=zeros(2*3,N_timePoints); %this seems to work
+%slightly better
 
-h0=.01;
+h0=.1;   %xx strange: more flopping around for small h0
 
 % %bundle decision variables for cases where h is a decision variable (e.g.
 % %when looking to achieve final desired tip position)
@@ -72,6 +74,7 @@ x0=[resulting_states_timeSeries0];
     
     %Gravity
     g=9.81; %duh
+    
     
     %Build params vector
     params=[ d,...
@@ -105,10 +108,10 @@ h1=figure(1);
 clf;
 axis equal;
 hold on;
-base_color=[1,1,1];
+colors=jet(N_timePoints);
 
 for t=1:N_timePoints
-    color=[1,1,1]-(t/N_timePoints)*base_color;
+    color=colors(t,:);
     q = resulting_states_timeSeries_final(1:3,t);
     visualize_q(q,L0,h1,color,'-')
 end
