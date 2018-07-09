@@ -5,12 +5,16 @@ function ceq=compute_lagrangian_constraints(forces,q_val,qdot_val,qddot_val,para
 %variables, which are passed into the function as q_val,qdot_val,qddot_val
 
 % reminder: params is defined as follows: 
-%   params=[ d,L0,E,I,Aeff,rho_line,g]; 
+%   params=[ d,L0,E,I,Aeff,rho_line,g,b1,b2,b3]; 
 L=params(2);
 E=params(3);
 I=params(4);
 rho=params(6); %xx consider to make this rho per area along the line. if so, remember changing the functions below
 g=params(7);
+
+b1=params(8);
+b2=params(9);
+b3=params(10);
 
 % for debugging xx remove
 % q_val=[1;1;1];
@@ -173,14 +177,15 @@ end
 %Lagrangian constraints with NEITHER external contact forces NOR actuator
 %moments (has to be equal to 0)
 
+
 ceq_lagrangian=@(q,qdot,qddot) ...    %note: this function definition step can be skipped
       Tkin_dqdot_dt(q,qdot,qddot)...
     - Tkin_dq(q,qdot,qddot)...
     + Vc_dq(q,qdot,qddot)...
     + Vg_dq(q,qdot,qddot)...
     + [Ma;0;0]...                  %add effect of actuator moment at the tip
-    + generalized_extForces_sum;   %add contribution of external forces
-
+    + generalized_extForces_sum...   %add contribution of external forces
+    + [b1;b2;b3].*qdot;              %add effect of damping xx care, verify
 
 
 ceq=ceq_lagrangian(q_val,qdot_val,qddot_val);

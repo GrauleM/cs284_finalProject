@@ -14,26 +14,32 @@
 constraint_multiplier=100000000;
 
 % Desired force profile over time
-Ma_step=-5.;
+Ma_step=2.;
 
 % each column in desired_forces is one point in time of the form
 % [Ma;forces;contact_points];
-desired_forces=transpose(...
-    [0,0,0;...
-     0,0,0;...
-     0,0,0;...
-     0,0,0;...
-     0,0,0;...
-     Ma_step,0,0;...
-     Ma_step,0,0;...
-     Ma_step,0,0;...
-     Ma_step,0,0;...
-     Ma_step,0,0;...
-    ]...
-    );
+% desired_forces=transpose(...
+%     [0,0,0;...
+%      0,0,0;...
+%      0,0,0;...
+%      0,0,0;...
+%      0,0,0;...
+%      Ma_step,0,0;...
+%      Ma_step,0,0;...
+%      Ma_step,0,0;...
+%      Ma_step,0,0;...
+%      Ma_step,0,0;...
+%     ]...
+%     );
 
-N_timePoints = size(desired_forces,2);%number of time points;
+N_timePoints = 40;%number of time points;
 
+N_contacts=1; %number of contact points (at least 1)
+desired_forces=zeros(2*N_contacts+1,N_timePoints);
+
+%stepTime=round(N_timePoints/2);
+stepTime=10;
+desired_forces(1,stepTime:end)=desired_forces(1,stepTime:end)+Ma_step;
 
 % Resulting configuration over time with the given force profile. This will
 % be optimized
@@ -45,7 +51,7 @@ resulting_states_timeSeries0=(rand(2*3,N_timePoints)-0.5)/10;
 %resulting_states_timeSeries0=zeros(2*3,N_timePoints); %this seems to work
 %slightly better
 
-h0=.1;   %xx strange: more flopping around for small h0
+h0=1;   %xx strange: more flopping around for small h0
 
 % %bundle decision variables for cases where h is a decision variable (e.g.
 % %when looking to achieve final desired tip position)
@@ -75,7 +81,12 @@ x0=[resulting_states_timeSeries0];
     %Gravity
     g=9.81; %duh
     
-    
+    %damping coefficients
+    b=10;
+    b1=1*b;
+    b2=1*b;
+    b3=1*b;
+
     %Build params vector
     params=[ d,...
              L0,...
@@ -83,7 +94,11 @@ x0=[resulting_states_timeSeries0];
              I,...            
              Aeff,...
              rho_line,...
-             g];
+             g,...
+             b1,...
+             b2,...
+             b3,...
+             ];
 
 % finally run the optimization
 options = optimoptions(@fmincon,'Algorithm','sqp','Display','iter');
@@ -109,17 +124,25 @@ clf;
 axis equal;
 hold on;
 colors=jet(N_timePoints);
-
+colormap(jet(N_timePoints));
 for t=1:N_timePoints
     color=colors(t,:);
     q = resulting_states_timeSeries_final(1:3,t);
     visualize_q(q,L0,h1,color,'-')
 end
+
+% use these axis limits for the following plots
 xl=xlim;
 yl=ylim;
-% use these axis limits for the following plots
 
+% add colorbar
+hc = colorbar;
+cb = linspace(1,N_timePoints,N_timePoints);
+set(hc, 'YTick',(cb-.5)./N_timePoints, 'YTickLabel',cb)
+hold off;
 
-% 
-h2=figure(2);
-visualize_q_timeSeries(resulting_states_timeSeries_final(1:3,:),L0,h2,[0,0,0],'-',xl,yl)
+% another way to plot this
+if 0
+    h2=figure(2);
+    visualize_q_timeSeries(resulting_states_timeSeries_final(1:3,:),L0,h2,[0,0,0],'-',xl,yl)
+end
