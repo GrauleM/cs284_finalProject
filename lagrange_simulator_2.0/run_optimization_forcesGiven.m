@@ -11,10 +11,10 @@
 % contact force and contact point. specify F_c=0 if no contact force is desired
 
 %constraint multiplier to achieve higher accuracy in constraints
-constraint_multiplier=100000000;
+constraint_multiplier=10000;
 
 % Desired force profile over time
-Ma_step=2.;
+Ma_step=0.;
 
 % each column in desired_forces is one point in time of the form
 % [Ma;forces;contact_points];
@@ -32,7 +32,7 @@ Ma_step=2.;
 %     ]...
 %     );
 
-N_timePoints = 40;%number of time points;
+N_timePoints = 50;%number of time points;
 
 N_contacts=1; %number of contact points (at least 1)
 desired_forces=zeros(2*N_contacts+1,N_timePoints);
@@ -47,11 +47,11 @@ desired_forces(1,stepTime:end)=desired_forces(1,stepTime:end)+Ma_step;
 % [q;qdot;qddot] %xx remove qddot?
 
 %decision variables: q and qdot
-resulting_states_timeSeries0=(rand(2*3,N_timePoints)-0.5)/10;
+resulting_states_timeSeries0=(rand(2*3,N_timePoints)-0.5)/10; %/1 doesnt work (convergence to infeasible point
 %resulting_states_timeSeries0=zeros(2*3,N_timePoints); %this seems to work
 %slightly better
 
-h0=1;   %xx strange: more flopping around for small h0
+h0=.1;   %xx strange: more flopping around for small h0
 
 % %bundle decision variables for cases where h is a decision variable (e.g.
 % %when looking to achieve final desired tip position)
@@ -72,7 +72,7 @@ x0=[resulting_states_timeSeries0];
     L0=1; %unstretched length in m
     
     %combined actuator density (line density of both actuators along backbone
-    rho_line=1; %xx tune this value
+    rho_line=5; %xx tune this value
     
     %Stiffness
     E=0.005*10^9; %the Youngs modulus of silicone rubber is 0.05GPa; we actually have a much lower stiffness due to flexures
@@ -82,7 +82,7 @@ x0=[resulting_states_timeSeries0];
     g=9.81; %duh
     
     %damping coefficients
-    b=10;
+    b=1;
     b1=1*b;
     b2=1*b;
     b3=1*b;
@@ -102,7 +102,7 @@ x0=[resulting_states_timeSeries0];
 
 % finally run the optimization
 options = optimoptions(@fmincon,'Algorithm','sqp','Display','iter');
-options = optimoptions(options,'ConstraintTolerance',1e-6,...
+options = optimoptions(options,'ConstraintTolerance',1e-10,...
                                'FunctionTolerance',1e-6);
 options = optimoptions(options,'SpecifyObjectiveGradient',false,'SpecifyConstraintGradient',false);
 options = optimoptions(options,'MaxFunctionEvaluations',10000);
@@ -113,6 +113,35 @@ lb = [ ]; ub = [ ];   % No upper or lower bounds
     x0,[],[],[],[],lb,ub,... 
     @(x)all_constraints_timeSeriesSimulator(x,desired_forces,params,constraint_multiplier,h0),...
     options);
+
+
+%% get q,qdot,qddot %xx change changing array size
+resulting_states_timeSeries=x;
+forces = []; 
+all_q = [];
+all_qdot = [];
+all_qddot = [];
+
+for t=1:N_timePoints-1   %c changes size in loop - not ideal
+    
+    %forces at this time point (also midpoint
+    forces0 = desired_forces(:,t);
+    forces1 = desired_forces(:,t+1);
+    forces  = [forces,1/2*(forces0+forces1)];
+    
+    q0      = resulting_states_timeSeries(1:3,t);
+    qdot0   = resulting_states_timeSeries(4:6,t);
+
+    q1      = resulting_states_timeSeries(1:3,t+1);
+    qdot1   = resulting_states_timeSeries(4:6,t+1);
+
+    %midpoints
+    all_q       = [all_q,1/2*(q0+q1)];
+    all_qdot    = [all_qdot,1/2*(qdot0+qdot1)];
+
+    %approximate qddot
+    all_qddot   = [all_qddot,(qdot1-qdot0)/h0];
+end
 
 
 %% plot those states
@@ -146,3 +175,7 @@ if 0
     h2=figure(2);
     visualize_q_timeSeries(resulting_states_timeSeries_final(1:3,:),L0,h2,[0,0,0],'-',xl,yl)
 end
+
+%% plot tip positions
+h3=figure(3);
+plot_tipPos_timeSeries(resulting_states_timeSeries_final(1:3,:),L0,h3,h0)

@@ -4,9 +4,11 @@ function [f,gradf] = objective_timeSeriesSimulator(x,params)
 % velocity and zero acceleration (enforced at midpoint between last and
 % second-to-last time points
 
-% objective: minimize h; this means to get stable as fast as possible. not
+% possible objective: minimize h; this means to get stable as fast as possible. not
 % sure this is the ideal objective
 
-f=0;
+% objective below: no velocity at final position
+
+f=1;
 
 end
