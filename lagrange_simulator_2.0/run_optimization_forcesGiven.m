@@ -7,17 +7,17 @@
 % essentially means that the actuator tip force has to be zero, and only
 % the actuator tip moment is changed in the optimization
 
-% using zero contact forces. note: always specify at least one pair of 
+% when using zero contact forces, note: always specify at least one pair of 
 % contact force and contact point. specify F_c=0 if no contact force is desired
 
-%constraint multiplier to achieve higher accuracy in constraints
 
 disp("use version R2017a or newer")
 
+%constraint multiplier to achieve higher accuracy in constraints
 constraint_multiplier=10000;
 
 % Desired force profile over time
-Ma_step=-5.;
+Ma_step=-15.;
 
 % each column in desired_forces is one point in time of the form
 % [Ma;forces;contact_points];
@@ -41,7 +41,7 @@ N_contacts=1; %number of contact points (at least 1)
 desired_forces=zeros(2*N_contacts+1,N_timePoints);
 
 %stepTime=round(N_timePoints/2);
-stepTime=20;
+stepTime_point=20;
 desired_forces(1,stepTime:end)=desired_forces(1,stepTime:end)+Ma_step;
 
 % Resulting configuration over time with the given force profile. This will
@@ -114,7 +114,7 @@ lb = [ ]; ub = [ ];   % No upper or lower bounds
 [x,fval] = fmincon(...
     @(x) objective_timeSeriesSimulator(x,params),...
     x0,[],[],[],[],lb,ub,... 
-    @(x)all_constraints_timeSeriesSimulator(x,desired_forces,params,constraint_multiplier,h0),...
+    @(x)allConstraints_timeSeriesSimulator(x,desired_forces,params,constraint_multiplier,h0),...
     options);
 
 
@@ -181,4 +181,4 @@ end
 
 %% plot tip positions
 h3=figure(3);
-plot_tipPos_timeSeries(resulting_states_timeSeries_final(1:3,:),L0,h3,h0)
+plot_tipPos_timeSeries(desired_forces,resulting_states_timeSeries_final(1:3,:),L0,h3,h0)

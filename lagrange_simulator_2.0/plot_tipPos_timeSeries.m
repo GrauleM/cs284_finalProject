@@ -1,4 +1,4 @@
-function plot_tipPos_timeSeries(q_series,L0,figHandle,h)
+function plot_tipPos_timeSeries(desired_forces,q_series,L0,figHandle,h)
 
     %h in input is the time step length
     % xx quick and dirty out of laziness
@@ -28,9 +28,16 @@ function plot_tipPos_timeSeries(q_series,L0,figHandle,h)
 
        
     end
-    subplot(2,1,1)
+    subplot(3,1,1)
     plot(timePoints,x_tip,'LineWidth',2);
-    subplot(2,1,2)
+    %xlabel('time [s]')
+    ylabel('tip position (x)')
+    subplot(3,1,2)
     plot(timePoints,y_tip,'LineWidth',2);
-    
+    %xlabel('time [s]')
+    ylabel('tip position (y)')
+    subplot(3,1,3)
+    plot(timePoints,desired_forces(1,:),'LineWidth',2);
+    xlabel('time [s]')
+    ylabel('tip moment')
 end
