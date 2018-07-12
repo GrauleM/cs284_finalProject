@@ -11,10 +11,13 @@
 % contact force and contact point. specify F_c=0 if no contact force is desired
 
 %constraint multiplier to achieve higher accuracy in constraints
+
+disp("use version R2017a or newer")
+
 constraint_multiplier=10000;
 
 % Desired force profile over time
-Ma_step=0.;
+Ma_step=-5.;
 
 % each column in desired_forces is one point in time of the form
 % [Ma;forces;contact_points];
@@ -38,7 +41,7 @@ N_contacts=1; %number of contact points (at least 1)
 desired_forces=zeros(2*N_contacts+1,N_timePoints);
 
 %stepTime=round(N_timePoints/2);
-stepTime=10;
+stepTime=20;
 desired_forces(1,stepTime:end)=desired_forces(1,stepTime:end)+Ma_step;
 
 % Resulting configuration over time with the given force profile. This will
