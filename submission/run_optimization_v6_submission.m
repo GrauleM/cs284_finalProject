@@ -5,7 +5,7 @@
 % obstacle. V6 also computes L directly through an equality constraint
 
 % USER INPUT
-%obstacle obst=[x_obstacle,y_obstacle,r_obstacle]: obstacle position and radius
+%obstacle obst=[x_obstacle,y_obstacle,r_obstacle]: obstacle center position and radius
 obst=[.45,-.07,.08];
 
 %the desired end pose

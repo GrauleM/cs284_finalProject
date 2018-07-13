@@ -46,23 +46,15 @@ desired_forces(1,stepTime:end)=desired_forces(1,stepTime:end)+Ma_step;
 
 % Resulting configuration over time with the given force profile. This will
 % be optimized
-% each column in resulting_states_timeSeries is one point in time of the form
-% [q;qdot;qddot] %xx remove qddot?
+% structure of states: each colum is one time point of the form [q;qdot]
 
 %decision variables: q and qdot
-resulting_states_timeSeries0=(rand(2*3,N_timePoints)-0.5)/10; %/1 doesnt work (convergence to infeasible point
-%resulting_states_timeSeries0=zeros(2*3,N_timePoints); %this seems to work
-%slightly better
+states0=(rand(2*3,N_timePoints)-0.5)/10; %/1 doesnt work (convergence to infeasible point
+%states0=zeros(2*3,N_timePoints); %this seems to work slightly better
 
 h0=.1;   %xx strange: more flopping around for small h0
 
-% %bundle decision variables for cases where h is a decision variable (e.g.
-% %when looking to achieve final desired tip position)
-% % x= [h;0;0...., desired_forces]
-% h_vec=[h0;zeros(size(resulting_states_timeSeries0,1)-1,1)];
-% x0=[h_vec,resulting_states_timeSeries0];
-
-x0=[resulting_states_timeSeries0];
+x0=[states0];
 
 %Params
     %Actuator geometries
