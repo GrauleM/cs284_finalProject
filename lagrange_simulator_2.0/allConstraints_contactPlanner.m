@@ -8,6 +8,8 @@ L=params(2);
 
 
 h=x(1,1);
+h=0.2; %xx careful debug hack - avoid changing h size
+
 states=x(1:6,2:end);
 N_timePoints = size(states,2);%number of time points;
 

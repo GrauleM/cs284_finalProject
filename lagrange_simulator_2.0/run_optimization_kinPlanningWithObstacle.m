@@ -15,11 +15,13 @@ disp("use version R2017a or newer")
 
 % USER INPUT
 %obstacle obst=[x_obstacle,y_obstacle,r_obstacle]: obstacle center position and radius
-obst=[.45,0.3,.05];
+obst=[.45,-0.21,.05];
 
 %desired end pose
 endPose_des = [1.,-.1,.15*pi];
 
+%xx care h is set to constant for debugging (in
+%allConstraints_contactPlanner
 
 %constraint multiplier to achieve higher accuracy in constraints
 constraint_multiplier=10000;
@@ -27,7 +29,7 @@ constraint_multiplier=10000;
 % xx Note: h0=0.1 and N_timePoints=25 with contact constraints but obstacle
 % far up converged to a solution
 
-N_timePoints = 15;%number of time points;
+N_timePoints = 15;%number of time points;  %xx note: 15 time points required 9k function evaluations without contact
 N_contacts=1; %number of contact points (at least 1)
 
 % optimization with following decision variables: actuator moments Ma, step
@@ -101,7 +103,7 @@ options = optimoptions(@fmincon,'Algorithm','sqp','Display','iter');
 options = optimoptions(options,'ConstraintTolerance',1e-10,...
                                'FunctionTolerance',1e-6);
 options = optimoptions(options,'SpecifyObjectiveGradient',false,'SpecifyConstraintGradient',false);
-options = optimoptions(options,'MaxFunctionEvaluations',10000);
+options = optimoptions(options,'MaxFunctionEvaluations',30000);
 
 lb = [ ]; ub = [ ];   % No upper or lower bounds
 [x_final,fval] = fmincon(...
