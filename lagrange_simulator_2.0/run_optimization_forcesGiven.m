@@ -42,7 +42,7 @@ desired_forces=zeros(2*N_contacts+1,N_timePoints);
 
 %stepTime=round(N_timePoints/2);
 stepTime_point=20;
-desired_forces(1,stepTime:end)=desired_forces(1,stepTime:end)+Ma_step;
+desired_forces(1,stepTime_point:end)=desired_forces(1,stepTime_point:end)+Ma_step;
 
 % Resulting configuration over time with the given force profile. This will
 % be optimized
@@ -111,7 +111,7 @@ lb = [ ]; ub = [ ];   % No upper or lower bounds
 
 
 %% get q,qdot,qddot %xx change changing array size
-resulting_states_timeSeries=x;
+states=x;
 forces = []; 
 all_q = [];
 all_qdot = [];
@@ -124,11 +124,11 @@ for t=1:N_timePoints-1   %c changes size in loop - not ideal
     forces1 = desired_forces(:,t+1);
     forces  = [forces,1/2*(forces0+forces1)];
     
-    q0      = resulting_states_timeSeries(1:3,t);
-    qdot0   = resulting_states_timeSeries(4:6,t);
+    q0      = states(1:3,t);
+    qdot0   = states(4:6,t);
 
-    q1      = resulting_states_timeSeries(1:3,t+1);
-    qdot1   = resulting_states_timeSeries(4:6,t+1);
+    q1      = states(1:3,t+1);
+    qdot1   = states(4:6,t+1);
 
     %midpoints
     all_q       = [all_q,1/2*(q0+q1)];
@@ -141,7 +141,7 @@ end
 
 %% plot those states
 close all;
-resulting_states_timeSeries_final=x;
+states=x;
 
 h1=figure(1);
 clf;
@@ -151,7 +151,7 @@ colors=jet(N_timePoints);
 colormap(jet(N_timePoints));
 for t=1:N_timePoints
     color=colors(t,:);
-    q = resulting_states_timeSeries_final(1:3,t);
+    q = states(1:3,t);
     visualize_q(q,L0,h1,color,'-')
 end
 
@@ -161,7 +161,7 @@ yl=ylim;
 
 % add colorbar
 hc = colorbar;
-cb = linspace(1,N_timePoints,N_timePoints);
+cb = linspace(1,N_timePoints,N_timePoints);  %xx add step width?
 set(hc, 'YTick',(cb-.5)./N_timePoints, 'YTickLabel',cb)
 hold off;
 
@@ -173,4 +173,4 @@ end
 
 %% plot tip positions
 h3=figure(3);
-plot_tipPos_timeSeries(desired_forces,resulting_states_timeSeries_final(1:3,:),L0,h3,h0)
+plot_tipPos_timeSeries(desired_forces,states(1:3,:),L0,h3,h0)

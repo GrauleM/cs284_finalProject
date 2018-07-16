@@ -2,6 +2,8 @@ function [c,ceq,DC,DCeq] = allConstraints_contactPlanner(x,params,constraint_mul
 %used in the version that finds the manipulator configurations, time step length h, 
 % actuator moments Ma under contact with a round obstacle
 
+L=params(2);
+
 % reminder structure of x: x= [h;0;0...., [states;forces] ]
 
 
@@ -9,9 +11,9 @@ h=x(1,1);
 states=x(1:6,2:end);
 N_timePoints = size(states,2);%number of time points;
 
-N_contacts=(size(x,1)-1)/3;
+N_contacts=(size(x,1)-6-1)/3; %-6 for 6 states, -1 for tip moment Ma
 
-forces=x(7:7+2*N_contacts+1,2:end);
+forces=x(7:7+2*N_contacts+1-1,2:end);
 slackVariables=x(7+2*N_contacts+1:end,2:end);
 
 
@@ -56,6 +58,13 @@ end
 ceq_final=[];
 ceq=[ceq;ceq_final];
 
+
+%add an equality constraint to ensure that final velocity and accelerations
+%are zero (equilibrium at the end). xx be very careful with this constraint.
+%only add it, if h is variable. even then, it may lead to infeasible
+%solutions. may be better to have this in the objective
+%ceq=[ceq;qdot;qddot];
+
 % add start state constraint if applicable
 q_desired_start=zeros(3,1);
 ceq_start=constraint_StartConfiguration(q_desired_start,states);
@@ -66,13 +75,6 @@ qdot_desired_start=zeros(3,1);
 ceq_start=constraint_StartVelocity(qdot_desired_start,states);
 ceq=[ceq;ceq_start];
 
-%add an equality constraint to ensure that final velocity and accelerations
-%are zero (equilibrium at the end)
-%ceq=[ceq;qdot;qddot];
-
-% add final state constraint if applicable
-ceq_final=[];
-ceq=[ceq;ceq_final];
 
 % constraint to make sure h is positive
 c=[c;-h];
@@ -82,10 +84,10 @@ c=[c;-h];
 c_pen=penetration_constraints(states,obst,L);
 c=[c;c_pen];
 
-% add complimentarity constraints for contact forces
-[c_comp,ceq_comp]=complementarity_constraints(states,forces,slackVariables,obst,L);
-c=[c;c_comp];
-ceq=[ceq;ceq_comp];
+% add constraints for contact forces
+[c_contact,ceq_contact]=contact_constraints(states,forces,slackVariables,obst,L);
+c=[c;c_contact];
+ceq=[ceq;ceq_contact];
 
 %constraints need to be row vectors, so fix this..
 c=constraint_multiplier*c';

@@ -10,8 +10,8 @@ N_checks=21;
 % create s points for the checks
 s_p=repmat(linspace(0,1,N_checks),1,size(states,2));
 
-dist = evaluate_guardFn_obstacle(states,s_p,obst,L); %for each point, distance to obstacle center has to be larger than obstacle radius r_o, or: -(dist)+r<=0
+neg_dist = evaluate_guardFn_obstacle(states,s_p,obst,L); %for each point, distance to obstacle center has to be larger than obstacle radius r_o, or: -(dist)+r<=0
 
-c_pen=-reshape(dist,[size(dist,1)*size(dist,2),1]);
+c_pen=reshape(neg_dist,[size(neg_dist,1)*size(neg_dist,2),1]);
 
 end
