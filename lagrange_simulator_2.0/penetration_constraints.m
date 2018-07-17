@@ -5,7 +5,7 @@ function c_pen=penetration_constraints(states,obst,L)
 % select number of equally spaced evaluation points along the manipulator
 % for which penetration is checked
 
-N_checks=11;
+N_checks=21;
 
 % create s points for the checks
 s_p=repmat(linspace(0,1,N_checks),1,size(states,2));

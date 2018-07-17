@@ -13,9 +13,13 @@
 
 disp("use version R2017a or newer")
 
+
+% clear up
+clear all; close all;
+
 % USER INPUT
 %obstacle obst=[x_obstacle,y_obstacle,r_obstacle]: obstacle center position and radius
-obst=[.45,-0.21,.05];
+obst=[.45,0.21,.05];
 
 %desired end pose
 endPose_des = [1.,-.1,.15*pi];
@@ -45,16 +49,28 @@ N_contacts=1; %number of contact points (at least 1)
 % structure of x: % x= [h;0;0...., [states;forces;slackVariables] ]
 % h: add required zero padding
 
+INITIALIZE=1; %if set to one, use old contact free states for initialization
+
+
 % initializations
 h0=0.2;
 states0=(rand(2*3,N_timePoints)-0.5)/10; %this didnt work yet
 states0=zeros(2*3,N_timePoints); 
+
+
+
 
 forces0=zeros(2*N_contacts+1,N_timePoints); %xx consider other initializations
 
 forces0(2:2+N_contacts-1,:) = 50.*(rand(1,N_timePoints)-.5);
 forces0(1+N_contacts+1:end,:)=rand(N_contacts,N_timePoints); %initialize all contact locations to be between 0 and 1
 slackVariables0=(rand(N_contacts,N_timePoints))/.1; %not sure this is the best initialization
+
+if INITIALIZE %initialize states with solution from obstacle free simulation
+    load('saved_xfinal_noContact_newObjective.mat','x_final');
+    states0=x_final(1:6,2:end);
+    forces0(2:2+N_contacts-1,:)=x_final(2:2+N_contacts-1,2:end);
+end
 
 x0=[[h0;zeros(2*3+1+3*N_contacts-1,1)], [states0;forces0;slackVariables0]];
 
@@ -107,7 +123,7 @@ options = optimoptions(options,'MaxFunctionEvaluations',30000);
 
 lb = [ ]; ub = [ ];   % No upper or lower bounds
 [x_final,fval] = fmincon(...
-    @(x) objective_contactPlanner(x,params),...
+    @(x) objective_contactPlanner(x,params,obst),...
     x0,[],[],[],[],lb,ub,... 
     @(x)allConstraints_contactPlanner(x,params,constraint_multiplier,obst),...
     options);
@@ -144,3 +160,9 @@ hold off;
 %% plot tip positions
 h3=figure(3);
 plot_tipPos_timeSeries(forces_final,states_final(1:3,:),L0,h3,h_final)
+
+%% save x_final
+if 1
+   save('saved_xfinal_noContact_newObjective.mat');
+end
+
