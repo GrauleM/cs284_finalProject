@@ -19,7 +19,7 @@ clear all; close all;
 
 % USER INPUT
 %obstacle obst=[x_obstacle,y_obstacle,r_obstacle]: obstacle center position and radius
-obst=[.45,0.30,.05];
+obst=[.45,-.20,.05];
 
 %desired end pose
 endPose_des = [1.,-.1,.15*pi];
@@ -49,7 +49,7 @@ N_contacts=1; %number of contact points (at least 1)
 % structure of x: % x= [h;0;0...., [states;forces;slackVariables] ]
 % h: add required zero padding
 
-INITIALIZE=0; %if set to one, use old contact free states for initialization
+INITIALIZE=1; %if set to one, use old contact free states for initialization
 
 
 % initializations
@@ -67,10 +67,12 @@ forces0(1+N_contacts+1:end,:)=rand(N_contacts,N_timePoints); %initialize all con
 slackVariables0=(rand(N_contacts,N_timePoints))/1.; %not sure this is the best initialization
 
 if INITIALIZE %initialize states with solution from obstacle free simulation
-    load('saved_xfinal_noContact_newObjective.mat','x_final');
-    states0=x_final(1:6,2:end);
-    forces0(2:2+N_contacts-1,:)=x_final(2:2+N_contacts-1,2:end);
-    forces0(1+N_contacts+1:end,:)=x_final(2+N_contacts:2+N_contacts+N_contacts-1,2:end);
+    load('saved_xfinal_ContactAbove_newObjective_30timepoints.mat','x_final','h_final');
+    states0=x_final(1:6,2:end); %states
+    forces0(1,:)=x_final(7,2:end); %tip moments
+    forces0(2:2+N_contacts-1,:)=x_final(8:8+N_contacts-1,2:end); %contact forces
+    slackVariables0=x_final(8+N_contacts-1+N_contacts+1:end,2:end);
+    h0=h_final;
 end
 
 x0=[[h0;zeros(2*3+1+3*N_contacts-1,1)], [states0;forces0;slackVariables0]];
@@ -117,21 +119,25 @@ x0=[[h0;zeros(2*3+1+3*N_contacts-1,1)], [states0;forces0;slackVariables0]];
         
 % finally run the optimization
 options = optimoptions(@fmincon,'Algorithm','sqp','Display','iter');
-options = optimoptions(options,'ConstraintTolerance',1e-10,...
+options = optimoptions(options,'ConstraintTolerance',1e-6,...
                                'FunctionTolerance',1e-6);
 options = optimoptions(options,'SpecifyObjectiveGradient',false,'SpecifyConstraintGradient',false);
-options = optimoptions(options,'MaxFunctionEvaluations',30000);
+options = optimoptions(options,'MaxFunctionEvaluations',20000);
 
 lb = [ ]; ub = [ ];   % No upper or lower bounds
 [x_final,fval] = fmincon(...
-    @(x) objective_contactPlanner(x,params,obst),...
+    @(x) objective_kinematicContactPlanner(x,params,obst),...
     x0,[],[],[],[],lb,ub,... 
-    @(x)allConstraints_contactPlanner(x,params,constraint_multiplier,obst),...
+    @(x)allConstraints_kinematicContactPlanner(x,params,constraint_multiplier,obst),...
     options);
 
 %% unpack states and plot
 close all;
 h_final=x_final(1,1);
+
+if 1 %if h was set to be constant previously
+    h_final=0.1;
+end
 states_final=x_final(1:6,2:end);
 forces_final=x_final(7:7+2*N_contacts+1-1,2:end);
 
@@ -164,6 +170,6 @@ plot_tipPos_timeSeries(forces_final,states_final(1:3,:),L0,h3,h_final)
 
 %% save x_final
 if 0
-   save('saved_xfinal_ContactUnderneath_newObjective_30timepoints.mat');
+   save('saved_xfinal_ContactBelow_newObjective_30timepoints_initializedFailed.mat');
 end
 
