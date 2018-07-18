@@ -19,7 +19,7 @@ clear all; close all;
 
 % USER INPUT
 %obstacle obst=[x_obstacle,y_obstacle,r_obstacle]: obstacle center position and radius
-obst=[.45,-.20,.05];
+obst=[.45,-.20,.75];
 
 %desired end pose
 endPose_des = [1.,-.1,.15*pi];
@@ -172,4 +172,8 @@ plot_tipPos_timeSeries(forces_final,states_final(1:3,:),L0,h3,h_final)
 if 0
    save('saved_xfinal_ContactBelow_newObjective_30timepoints_initializedFailed.mat');
 end
+
+%% 
+%check penetration constraints
+p_test=penetration_constraints(states0,obst,L0)
 

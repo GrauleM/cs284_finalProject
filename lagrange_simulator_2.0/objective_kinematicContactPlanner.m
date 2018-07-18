@@ -1,4 +1,4 @@
-function [f,gradf] = objective_contactPlanner(x,params,obst)
+function [f,gradf] = objective_kinematicContactPlanner(x,params,obst)
 %used in the version that finds the manipulator configurations, time step length h, 
 % actuator moments Ma under contact with a round obstacle
 

@@ -30,7 +30,6 @@ for i=1:size(states,2)
     qddot=zeros(3,1);  %xx care, wrong!
     
     for j=1:size(s_p,1)
-        
        current_sp=s_p(j,i); 
        %compute position of point P (integrate from 0 to s_p*L)
        xp=custom_numerical_integrator_1fn(...

@@ -1,4 +1,4 @@
-function [c,ceq,DC,DCeq] = allConstraints_contactPlanner(x,params,constraint_multiplier,obst)
+function [c,ceq,DC,DCeq] = allConstraints_kinematicContactPlanner(x,params,constraint_multiplier,obst)
 %used in the version that finds the manipulator configurations, time step length h, 
 % actuator moments Ma under contact with a round obstacle
 
