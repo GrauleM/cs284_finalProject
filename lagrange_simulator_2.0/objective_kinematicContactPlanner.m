@@ -22,9 +22,9 @@ ob2=forces(1,:)*forces(1,:)'; %minimize actuator moments
 %objective 3: reward high contact force magnitude to encourage the
 %occurance of contact
 ob3=0;
-% for i=1:N_contacts
-%     ob3=ob3-forces(1+i,:)*forces(1+i,:)';
-% end
+for i=1:N_contacts
+     ob3=ob3-forces(1+i,:)*forces(1+i,:)';
+end
 
 % objective 4: reward proximity between the contact point and the
 % obstacle
@@ -35,6 +35,6 @@ for i=1:N_contacts
 end
 
 
-f=ob1+ob2+ob3+ob4;
+f=ob1+100000*ob2+ob3+ob4;
 
 end

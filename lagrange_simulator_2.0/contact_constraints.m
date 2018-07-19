@@ -41,6 +41,7 @@ for i=1:N_timePoints %for each time point %xx for speed-up, remove for loops and
         %for the point is between 0 and manipulator length L, i.e. c is between 0 and 1)
         c_contact=[c_contact;-c;c-1.];
         
+        
         %make sure that the contact point is not IN the obstacle 
         guard_constr=evaluate_guardFn_obstacle(states(:,i),c,obst,L);
         c_contact=[c_contact;guard_constr];
@@ -65,6 +66,11 @@ for i=1:N_timePoints %for each time point %xx for speed-up, remove for loops and
            y_helper,...
            q,qdot,qddot,c.*L);
         
+        %make sure that the contact point c is the point on the manipulator
+        %which is closest to the obstacle center
+        ceq_closestPoint=tan(phi(c.*L,q,qdot,qddot))+(obst(1)-xp)/(obst(2)-yp);
+        ceq_contact=[ceq_contact;ceq_closestPoint];
+          
         % ensure that contact force points away from the obstacle
         contact_direction=[xp;yp]-[obst(1);obst(2)];
         c_direction=-Fc*current_force_direction'*contact_direction; %xx unsure if its better to use sign(Fc) or just Fc here

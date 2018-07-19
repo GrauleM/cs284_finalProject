@@ -19,7 +19,7 @@ clear all; close all;
 
 % USER INPUT
 %obstacle obst=[x_obstacle,y_obstacle,r_obstacle]: obstacle center position and radius
-obst=[.45,-.20,.75];
+obst=[.45,-.20,.075];
 
 %desired end pose
 endPose_des = [1.,-.1,.15*pi];
@@ -175,5 +175,5 @@ end
 
 %% 
 %check penetration constraints
-p_test=penetration_constraints(states0,obst,L0)
+%p_test=penetration_constraints(states0,obst,L0)
 
