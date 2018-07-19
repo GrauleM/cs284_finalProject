@@ -83,8 +83,9 @@ c=[c;-h];
 
 % add constraints to ensure that the manipulator doesnt penetrate the
 % obstacle at any time point
-c_pen=penetration_constraints(states,obst,L);
-c=[c;c_pen];
+% c_pen=penetration_constraints(states,obst,L);
+% c=[c;c_pen];  %commented this out for new type of penetration check
+% (closest point)
 
 % add constraints for contact forces
 [c_contact,ceq_contact]=contact_constraints(states,forces,slackVariables,obst,L);
