@@ -71,7 +71,7 @@ if INITIALIZE %initialize states with solution from obstacle free simulation
     states0=x_final(1:6,2:end); %states
     forces0(1,:)=x_final(7,2:end); %tip moments
     forces0(2:2+N_contacts-1,:)=x_final(8:8+N_contacts-1,2:end); %contact forces
-    slackVariables0=x_final(8+N_contacts-1+N_contacts+1:end,2:end);
+    %slackVariables0=x_final(8+N_contacts-1+N_contacts+1:end,2:end);
     h0=h_final;
 end
 
