@@ -19,7 +19,7 @@ clear all; close all;
 
 % USER INPUT
 %obstacle obst=[x_obstacle,y_obstacle,r_obstacle]: obstacle center position and radius
-obst=[.45,-.20,.075];
+obst=[.45,.20,.075];
 
 %desired end pose
 endPose_des = [1.,-.1,.15*pi];
@@ -49,7 +49,7 @@ N_contacts=1; %number of contact points (at least 1)
 % structure of x: % x= [h;0;0...., [states;forces;slackVariables] ]
 % h: add required zero padding
 
-INITIALIZE=1; %if set to one, use old contact free states for initialization
+INITIALIZE=0; %if set to one, use old contact free states for initialization
 
 
 % initializations

@@ -68,8 +68,8 @@ for i=1:N_timePoints %for each time point %xx for speed-up, remove for loops and
         
         %make sure that the contact point c is the point on the manipulator
         %which is closest to the obstacle center
-        ceq_closestPoint=tan(phi(c.*L,q,qdot,qddot))+(obst(1)-xp)/(obst(2)-yp);
-        ceq_contact=[ceq_contact;ceq_closestPoint];
+%         ceq_closestPoint=tan(phi(c.*L,q,qdot,qddot))+(obst(1)-xp)/(obst(2)-yp);
+%         ceq_contact=[ceq_contact;ceq_closestPoint];
           
         % ensure that contact force points away from the obstacle
         contact_direction=[xp;yp]-[obst(1);obst(2)];
