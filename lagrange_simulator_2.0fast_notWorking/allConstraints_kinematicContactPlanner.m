@@ -24,6 +24,41 @@ slackVariables=x(7+2*N_contacts+1:end,2:end);
 c=[];
 ceq=[];
 
+% % include dynamics constraints
+% 
+% % midpoint q and qdot
+% midpoint_states=(states(:,1:N_timePoints-1)+states(:,2:N_timePoints))/2;
+% %approximate qdot as diff of q and qddot as difference of qdot
+% % i.e.    qddot   = (qdot1-qdot0)/h; qdot = (q1-q0)/h;
+% midpoint_derivatives=(states(:,2:N_timePoints)+states(:,1:N_timePoints-1))/h;
+% 
+% %midpoint forces (%defined as constant from time k) xx may be better to use
+% %average here?
+% 
+%  %constraint to enforce that qdot is the derivative of q at midpoint xx DONT FORGET
+%     %ME!
+% qdot_enf=midpoint_states(4:6,:)-midpoint_derivatives(1:3,:);    
+% ceq=qdot_enf(:);  %xx care to not have any other constraints before this
+% for t=1:N_timePoints-1   %c,ceq changes size in loop - not ideal
+%     
+%     %forces at this time point (NOT midpoint)
+%     force  = forces(:,t);
+%     
+%     %midpoints
+%     q       = midpoint_states(1:3,t);
+%     qdot    = midpoint_states(4:6,t);
+% 
+%     %approximate qddot
+%     qddot   = midpoint_derivatives(4:6,t);
+%         
+%     %enforce lagrangian
+%     ceq_lagrangian = ...
+%         compute_lagrangian_constraints(force,q,qdot,qddot,params);
+%     ceq=[ceq;ceq_lagrangian];
+%     
+% end
+
+
 % include dynamics constraints
 for t=1:N_timePoints-1   %c,ceq changes size in loop - not ideal
     
@@ -84,8 +119,7 @@ c=[c;-h];
 % add constraints to ensure that the manipulator doesnt penetrate the
 % obstacle at any time point
 c_pen=penetration_constraints(states,obst,L);
-c=[c;c_pen];  %commented this out for new type of penetration check
-% (closest point)
+c=[c;c_pen];
 
 % add constraints for contact forces
 [c_contact,ceq_contact]=contact_constraints(states,forces,slackVariables,obst,L);

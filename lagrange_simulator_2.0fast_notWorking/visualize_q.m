@@ -20,7 +20,7 @@ function visualize_q(q_in,L0,figHandle,color,style)
     end
     figure(figHandle);
     hold on
-    plot(x_s,y_s,style,'Color',color);
+    plot(x_s,y_s,style,'Color',color,'LineWidth',2);
     axis equal
 
 

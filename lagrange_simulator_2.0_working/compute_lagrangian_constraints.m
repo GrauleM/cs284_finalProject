@@ -40,7 +40,7 @@ end
 
 
 %phi(s),phidot(s) and phiddot(s)
-phi     =@(s,q)     q(1)*s/L+q(2)*(s^2/L^2-s/L)+q(3)*(2*s^3/L^3-3*s^2/L^2+s/L);
+%phi     =@(s,q)     q(1)*s/L+q(2)*(s^2/L^2-s/L)+q(3)*(2*s^3/L^3-3*s^2/L^2+s/L);
 phidot  =@(s,qdot)  qdot(1)*s/L+qdot(2)*(s^2/L^2-s/L)+qdot(3)*(2*s^3/L^3-3*s^2/L^2+s/L);
 phiddot =@(s,qddot) qddot(1)*s/L+qddot(2)*(s^2/L^2-s/L)+qddot(3)*(2*s^3/L^3-3*s^2/L^2+s/L);
 
@@ -57,26 +57,26 @@ phiddot_dqddot=@(s,qddot)   [s/L;...
 
 % various integration helper functions
 % these functions need to be integrated from 0 to s to get x(s) and y(s)        
-x_helper=@(s,q,qdot,qddot)          cos(phi(s,q));
-y_helper=@(s,q,qdot,qddot)          sin(phi(s,q));
+x_helper=@(s,q,qdot,qddot)          cos(phi(s,q,qdot,qddot,L));
+y_helper=@(s,q,qdot,qddot)          sin(phi(s,q,qdot,qddot,L));
 % this function needs to be integrated from 0 to s to get dx(s)/dq and dy(s)/dq        
-x_dq_helper=@(s,q,qdot,qddot)       -sin(phi(s,q))*phi_dq(s,q);   
-y_dq_helper=@(s,q,qdot,qddot)       cos(phi(s,q))*phi_dq(s,q);   
+x_dq_helper=@(s,q,qdot,qddot)       -sin(phi(s,q,qdot,qddot,L))*phi_dq(s,q);   
+y_dq_helper=@(s,q,qdot,qddot)       cos(phi(s,q,qdot,qddot,L))*phi_dq(s,q);   
 % these functions need to be integrated from 0 to s to get xdot(s) and ydot(s)        
-xdot_helper=@(s,q,qdot,qddot)       -sin(phi(s,q))*phidot(s,qdot);
-ydot_helper=@(s,q,qdot,qddot)       cos(phi(s,q))*phidot(s,qdot);  
+xdot_helper=@(s,q,qdot,qddot)       -sin(phi(s,q,qdot,qddot,L))*phidot(s,qdot);
+ydot_helper=@(s,q,qdot,qddot)       cos(phi(s,q,qdot,qddot,L))*phidot(s,qdot);  
 % these functions need to be integrated from 0 to s to get xddot(s) and yddot(s)        
-xddot_helper=@(s,q,qdot,qddot)      -cos(phi(s,q))*phidot(s,qdot)^2-sin(phi(s,q))*phiddot(s,qddot);
-yddot_helper=@(s,q,qdot,qddot)      -sin(phi(s,q))*phidot(s,qdot)^2+cos(phi(s,q))*phiddot(s,qddot);
+xddot_helper=@(s,q,qdot,qddot)      -cos(phi(s,q,qdot,qddot,L))*phidot(s,qdot)^2-sin(phi(s,q,qdot,qddot,L))*phiddot(s,qddot);
+yddot_helper=@(s,q,qdot,qddot)      -sin(phi(s,q,qdot,qddot,L))*phidot(s,qdot)^2+cos(phi(s,q,qdot,qddot,L))*phiddot(s,qddot);
 % these functions need to be integrated from 0 to s to get dxdot(s)/dq and dydot(s)/dq        
-xdot_dq_helper=@(s,q,qdot,qddot)    -cos(phi(s,q))*phidot(s,qdot)*phi_dq(s,q);   
-ydot_dq_helper=@(s,q,qdot,qddot)    -sin(phi(s,q))*phidot(s,qdot)*phi_dq(s,q);   
+xdot_dq_helper=@(s,q,qdot,qddot)    -cos(phi(s,q,qdot,qddot,L))*phidot(s,qdot)*phi_dq(s,q);   
+ydot_dq_helper=@(s,q,qdot,qddot)    -sin(phi(s,q,qdot,qddot,L))*phidot(s,qdot)*phi_dq(s,q);   
 % these functions need to be integrated from 0 to s to get dxdot(s)/dqdot and dydot(s)/dqdot        
-xdot_dqdot_helper=@(s,q,qdot,qddot) sin(phi(s,q))*phidot_dqdot(s,qdot);
-ydot_dqdot_helper=@(s,q,qdot,qddot) cos(phi(s,q))*phidot_dqdot(s,qdot);
+xdot_dqdot_helper=@(s,q,qdot,qddot) sin(phi(s,q,qdot,qddot,L))*phidot_dqdot(s,qdot);
+ydot_dqdot_helper=@(s,q,qdot,qddot) cos(phi(s,q,qdot,qddot,L))*phidot_dqdot(s,qdot);
 % these functions need to be integrated from 0 to s to get dxddot(s)/dqdot and dyddot(s)/dqdot        
-xddot_dqdot_helper=@(s,q,qdot,qddot) -2*cos(phi(s,q))*phidot(s,qdot)*phidot_dqdot(s,qdot);
-yddot_dqdot_helper=@(s,q,qdot,qddot) -2*sin(phi(s,q))*phidot(s,qdot)*phidot_dqdot(s,qdot);
+xddot_dqdot_helper=@(s,q,qdot,qddot) -2*cos(phi(s,q,qdot,qddot,L))*phidot(s,qdot)*phidot_dqdot(s,qdot);
+yddot_dqdot_helper=@(s,q,qdot,qddot) -2*sin(phi(s,q,qdot,qddot,L))*phidot(s,qdot)*phidot_dqdot(s,qdot);
 
 
 %Derivatives of Vc with respect to q
@@ -163,15 +163,15 @@ J_sc_transpose=@(c,L,q,qdot,qddot) ...
 % directional contact forces (xx important: this assumes contact forces are
 % normal to the backbone!)
 % at contact point defined by sc
-Fc_direction_sc =@(c,L,q) [...
-        sin(phi(c.*L,q));...
-        -cos(phi(c.*L,q))];
+Fc_direction_sc =@(c,q,qdot,qddot,L) [...
+        sin(phi(c.*L,q,qdot,qddot,L));...
+        -cos(phi(c.*L,q,qdot,qddot,L))];
     
 % sum accross all contact forces
 generalized_extForces_sum=0;
 for ii=1:length(c_points)
         c=c_points(ii);
-        generalized_extForces_sum=generalized_extForces_sum+Fc_mags(ii)*J_sc_transpose(c,L,q_val,qdot_val,qddot_val)*Fc_direction_sc(c,L,q_val);
+        generalized_extForces_sum=generalized_extForces_sum+Fc_mags(ii)*J_sc_transpose(c,L,q_val,qdot_val,qddot_val)*Fc_direction_sc(c,q_val,qdot_val,qddot_val,L);
 end
 
 %Lagrangian constraints with NEITHER external contact forces NOR actuator

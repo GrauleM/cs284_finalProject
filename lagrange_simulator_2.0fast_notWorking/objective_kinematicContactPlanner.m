@@ -35,6 +35,9 @@ for i=1:N_contacts
 end
 
 
-f=ob1+100000*ob2+ob3+ob4;
+%f=ob1+100000*ob2+ob3+ob4; % this doesnt seem to work (convergence to
+%infeasible point
+f=ob1+ob2+ob3+ob4;  % but this works
+
 
 end

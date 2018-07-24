@@ -14,12 +14,12 @@ function neg_dist = evaluate_guardFn_obstacle(states,s_p,obst,L)
 % output dist is a matrix of distances with N rows. each colum in dist is a time point
 
 % define some helper functions
-phi     =@(s,q,qdot,qddot)     q(1)*s/L+q(2)*(s^2/L^2-s/L)+q(3)*(2*s^3/L^3-3*s^2/L^2+s/L);
+%phi     =@(s,q,qdot,qddot)     q(1)*s/L+q(2)*(s^2/L^2-s/L)+q(3)*(2*s^3/L^3-3*s^2/L^2+s/L);
 
 % integration helper functions
 % these functions need to be integrated from 0 to s to get x(s) and y(s)        
-x_helper=@(s,q,qdot,qddot)          cos(phi(s,q,qdot,qddot));
-y_helper=@(s,q,qdot,qddot)          sin(phi(s,q,qdot,qddot));
+x_helper=@(s,q,qdot,qddot)          cos(phi(s,q,qdot,qddot,L));
+y_helper=@(s,q,qdot,qddot)          sin(phi(s,q,qdot,qddot,L));
 
 
 dist=zeros(size(s_p));
@@ -27,7 +27,7 @@ dist=zeros(size(s_p));
 for i=1:size(states,2)
     q=states(1:3,i);
     qdot=states(4:6,i); 
-    qddot=zeros(3,1);  %xx care, wrong!
+    qddot=zeros(3,1);  %xx care, wrong value!
     
     for j=1:size(s_p,1)
        current_sp=s_p(j,i); 

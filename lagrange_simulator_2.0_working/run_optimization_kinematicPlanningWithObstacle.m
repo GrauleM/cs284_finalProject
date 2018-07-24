@@ -122,7 +122,7 @@ options = optimoptions(@fmincon,'Algorithm','sqp','Display','iter');
 options = optimoptions(options,'ConstraintTolerance',1e-6,...
                                'FunctionTolerance',1e-6);
 options = optimoptions(options,'SpecifyObjectiveGradient',false,'SpecifyConstraintGradient',false);
-options = optimoptions(options,'MaxFunctionEvaluations',20000);
+options = optimoptions(options,'MaxFunctionEvaluations',30000);
 
 lb = [ ]; ub = [ ];   % No upper or lower bounds
 [x_final,fval] = fmincon(...
