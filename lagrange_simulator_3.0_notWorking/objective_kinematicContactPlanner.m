@@ -34,10 +34,7 @@ for i=1:N_contacts
     ob4=ob4+evaluate_guardFn_obstacle(states,s_c,obst,L)*evaluate_guardFn_obstacle(states,s_c,obst,L)';
 end
 
-
-%f=ob1+100000*ob2+ob3+ob4; % this doesnt seem to work (convergence to
-%infeasible point
-f=ob1+ob2+ob3+ob4;  % but this works
-
+%f=ob1+100000*ob2+ob3+ob4; %this does not converge to feasible solution
+f=ob1+1*ob2+ob3+ob4;
 
 end

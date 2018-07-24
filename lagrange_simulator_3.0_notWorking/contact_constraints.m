@@ -1,16 +1,18 @@
-function [c_contact,ceq_contact]=contact_constraints(states,forces,slackVariables,obst,L)
+function [c_contact_out,ceq_contact_out]=contact_constraints(states,forces,slackVariables,obst,L)
 
-% inequality constraints 
-c_contact=[];
 
-% equality constraints 
-ceq_contact=[];
 
 % number of contact forces
 N_contacts=size(slackVariables,1);
 
 % number of time points
 N_timePoints=size(slackVariables,2);
+
+% inequality constraints 
+c_contact=zeros(N_timePoints,N_contacts*5);
+
+% equality constraints 
+ceq_contact=zeros(N_timePoints,N_contacts*2);
 
 % directionality vector for contact force
 % define some helper functions
@@ -39,20 +41,28 @@ for i=1:N_timePoints %for each time point %xx for speed-up, remove for loops and
         
         %ensure that the contact point is on the manipulator (i.e. arch length
         %for the point is between 0 and manipulator length L, i.e. c is between 0 and 1)
-        c_contact=[c_contact;-c;c-1.];
+        c_contact(i,5*(j-1)+1)=-c;
+        c_contact(i,5*(j-1)+2)=c-1.;
+        % old: c_contact=[c_contact;-c;c-1.];
         
         
         %make sure that the contact point is not IN the obstacle 
+        % xx CARE: this check is risky - the contact point may be a local
+        % minimimum in distance to obstacle and other points may be closer
+        % to the obstacle (they may then penetrate the obst)
         guard_constr=evaluate_guardFn_obstacle(states(:,i),c,obst,L);
-        c_contact=[c_contact;guard_constr];
+        c_contact(i,5*(j-1)+3)=guard_constr;        
+        % old: c_contact=[c_contact;guard_constr];
 
         %ensure that slack variable is positive (DONT forget that these
         %slack variables need to be driven to 0 through the optimisation
         %objective
-        c_contact=[c_contact;-y];
+        c_contact(i,5*(j-1)+4)=-y;        
+        % old: c_contact=[c_contact;-y];
 
         %complementarity constraint
-        ceq_contact=[ceq_contact;guard_constr.*Fc-y];
+        ceq_contact(i,2*(j-1)+1)=guard_constr.*Fc-y;        
+        % old: ceq_contact=[ceq_contact;guard_constr.*Fc-y];
         
         %direction of contact force
         q=states(1:3,i); qdot=[]; qddot=[];
@@ -70,18 +80,21 @@ for i=1:N_timePoints %for each time point %xx for speed-up, remove for loops and
         %which is closest to the obstacle center (either local minimum OR
         %c=0 OR c=1 - hence the multiplications)
 %         ceq_closestPoint=(tan(phi(c.*L,q,qdot,qddot))+(obst(1)-xp)/(obst(2)-yp))*c*(c-1);
-%         ceq_contact=[ceq_contact;ceq_closestPoint];
+%         ceq_contact=[ceq_contact;ceq_closestPoint];             
+        % old: ceq_contact=[ceq_contact;ceq_closestPoint];
           
         % ensure that contact force points away from the obstacle
         contact_direction=[xp;yp]-[obst(1);obst(2)];
-        c_direction=-Fc*current_force_direction'*contact_direction; %xx unsure if its better to use sign(Fc) or just Fc here
-        c_contact=[c_contact;c_direction];
+        c_direction=-sign(Fc)*current_force_direction'*contact_direction; %xx unsure if its better to use sign(Fc) or just Fc here
+        c_contact(i,5*(j-1)+5)=c_direction;                
+        % old: c_contact=[c_contact;c_direction];
 
         
     end
     
 end
 
-
+c_contact_out=c_contact(:);
+ceq_contact_out=ceq_contact(:);
 
 end
