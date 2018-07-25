@@ -14,7 +14,7 @@ N_timePoints=size(slackVariables,2);
 
 % directionality vector for contact force
 % define some helper functions
-phi     =@(s,q,qdot,qddot)          q(1)*s/L+q(2)*(s^2/L^2-s/L)+q(3)*(2*s^3/L^3-3*s^2/L^2+s/L);
+phi     =@(s,q,qdot,qddot)          q(1).*s./L+q(2).*(s.^2./L.^2-s./L)+q(3).*(2.*s.^3./L.^3-3.*s.^2./L.^2+s./L); %xx todo: replace with global phi
 
 
 %direction of contact force at contact point defined by c

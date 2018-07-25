@@ -21,23 +21,22 @@ wi_o=wi_i;
 out=0;
 
 for j=1:length(wi_o)
+    inner_sum1=0;
+    inner_sum2=0;
 
-    inner_sum1=wi_i*transpose(fun1(L.*(xi_o(j)+1).*(xi_i+1)/4,q,qdot,qddot));
+    for i=1:length(wi_o)
+        summand=wi_i(i)*fun1(L*(xi_o(j)+1)*(xi_i(i)+1)/4,q,qdot,qddot);
+        inner_sum1=inner_sum1+summand;
+    end
     
-    inner_sum2=wi_i*transpose(fun2(L.*(xi_o(j)+1).*(xi_i+1)/4,q,qdot,qddot));
-
+    for i=1:length(wi_o)
+        summand=wi_i(i)*fun2(L*(xi_o(j)+1)*(xi_i(i)+1)/4,q,qdot,qddot);
+        inner_sum2=inner_sum2+summand;
+    end
     
-    out=out+(xi_o(j)+1)^2*wi_o(j)*inner_sum1'*inner_sum2';
+    out=out+(xi_o(j)+1)^2*wi_o(j)*inner_sum1*inner_sum2;
 end
 
-%potential speedup through vectorization of the outer loop - but the code below is
-%wrong - it doesnt work for vector functions, only for scalar ones
-% inner_sum1=wi_i*transpose(fun1(L.*(xi_o'+1).*(xi_i+1)./4,q,qdot,qddot));    
-% inner_sum2=wi_i*transpose(fun2(L.*(xi_o'+1).*(xi_i+1)./4,q,qdot,qddot));
-% out=((xi_o+1).^2.*wi_o)*(inner_sum1.*inner_sum2)';
-
-
-
-out=out.*L.^3./32;
+out=out*L^3/32;
     
 end

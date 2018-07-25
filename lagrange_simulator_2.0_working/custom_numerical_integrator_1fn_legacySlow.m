@@ -1,4 +1,4 @@
-function out=custom_numerical_integrator_1fn(fun,q,qdot,qddot,L)
+function out=custom_numerical_integrator_1fn_legacySlow(fun,q,qdot,qddot,L)
 % using Gauss-Legendre Quadrature to integrare the function f(s_hat) (supplied as
 % function handle fun) twice.
 
@@ -38,36 +38,17 @@ wi_i=[0.568889,0.478629,0.478629,0.236927,0.236927];
 xi_o=xi_i;
 wi_o=wi_i;
 
-   out=0;
+out=0;
+
 for j=1:length(wi_o)
-    inner_sum=wi_i*transpose(fun(L.*(xi_o(j)+1).*(xi_i+1)/4,q,qdot,qddot));
-    out=out+(xi_o(j)+1).*wi_o(j).*inner_sum';
+    inner_sum=0;
+    for i=1:length(wi_o)
+        summand=wi_i(i).*fun(L.*(xi_o(j)+1).*(xi_i(i)+1)/4,q,qdot,qddot);
+        inner_sum=inner_sum+summand;
+    end
+    out=out+(xi_o(j)+1)*wi_o(j)*inner_sum;
 end
 
-% xi_o_rep=repmat(xi_o,1,length(xi_i))
-% out2=
-% xx potential speed-up through removing outer - loop but the code below is
-%wrong
-% s_val2=L.*(xi_o+1)'.*(xi_i+1)./4
-% s_val2=s_val2(:)'
-% wi_i_rep=repmat(wi_i,1,length(wi_o))
-% inner_sum=wi_i_rep*fun(L.*(xi_o+1)'.*(xi_i+1)./4,q,qdot,qddot);
-
-
-% debug=fun(L.*(xi_o+1).*(xi_i+1)./4,q,qdot,qddot)
-% debug2=(wi_i*transpose(fun(L.*(xi_o+1)*(xi_i+1)./4,q,qdot,qddot)))
-% out=((xi_o+1).*wi_o)*(wi_i*transpose(fun(L.*(xi_o'+1).*(xi_i+1)./4,q,qdot,qddot)))';
-
-% legacy code
-% for j=1:length(wi_o)
-%     inner_sum=0;
-%     for i=1:length(wi_i)
-%         summand=wi_i(i).*fun(L.*(xi_o(j)+1).*(xi_i(i)+1)/4,q,qdot,qddot);
-%         inner_sum=inner_sum+summand;
-%     end
-%     out=out+(xi_o(j)+1)*wi_o(j)*inner_sum;
-% end
-
-out=out.*L.^2./8;
+out=out*L^2/8;
     
 end

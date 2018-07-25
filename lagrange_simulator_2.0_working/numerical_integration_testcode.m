@@ -1,7 +1,7 @@
 %TEST CODE FOR CUSTOM NUMERICAL INTEGRATION
 
 %% test code for custom_numerical_integrator_1fn.m
-q=1;qdot=0;qddot=0;
+q=[1;1;1];qdot=[0;0;0];qddot=[0;0;0];
 L=2;
 
 % test 1

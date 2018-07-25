@@ -30,7 +30,7 @@ for t=1:N_timePoints-1   %c,ceq changes size in loop - not ideal
     %forces at this time point (also midpoint)
     force0 = forces(:,t);
     force1 = forces(:,t+1);
-    force  = 1/2*(force0+force1);
+    force  = 1/2.*(force0+force1);
     
     q0      = states(1:3,t);
     qdot0   = states(4:6,t);
@@ -39,15 +39,15 @@ for t=1:N_timePoints-1   %c,ceq changes size in loop - not ideal
     qdot1   = states(4:6,t+1);
     
     %midpoints
-    q       = 1/2*(q0+q1);
-    qdot    = 1/2*(qdot0+qdot1);
+    q       = 1/2.*(q0+q1);
+    qdot    = 1/2.*(qdot0+qdot1);
 
     %approximate qddot
-    qddot   = (qdot1-qdot0)/h;
+    qddot   = (qdot1-qdot0)./h;
     
     %enforce that qdot is the derivative of q at midpoint xx DONT FORGET
     %ME!
-    qdot_enf=qdot-(q1-q0)/h;
+    qdot_enf=qdot-(q1-q0)./h;
     
     %enforce lagrangian
     ceq_lagrangian = ...
