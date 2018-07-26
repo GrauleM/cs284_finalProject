@@ -14,19 +14,19 @@ N_timePoints=size(slackVariables,2);
 
 % directionality vector for contact force
 % define some helper functions
-phi     =@(s,q,qdot,qddot)          q(1).*s./L+q(2).*(s.^2./L.^2-s./L)+q(3).*(2.*s.^3./L.^3-3.*s.^2./L.^2+s./L); %xx todo: replace with global phi
+%phi     =@(s,q,qdot,qddot)          q(1).*s./L+q(2).*(s.^2./L.^2-s./L)+q(3).*(2.*s.^3./L.^3-3.*s.^2./L.^2+s./L); %xx todo: replace with global phi
 
 
 %direction of contact force at contact point defined by c
 force_direction = @(s,q,qdot,qddot) [...
-                        sin(phi(s,q,qdot,qddot));...
-                        -cos(phi(s,q,qdot,qddot))];
+                        sin(phi(s,q,qdot,qddot,L));...
+                        -cos(phi(s,q,qdot,qddot,L))];
 
 % may be more efficient solutions than redefining these functions and helpers so many times                    
 % integration helper functions
 % these functions need to be integrated from 0 to s to get x(s) and y(s)        
-x_helper=@(s,q,qdot,qddot)          cos(phi(s,q,qdot,qddot));
-y_helper=@(s,q,qdot,qddot)          sin(phi(s,q,qdot,qddot));
+x_helper=@(s,q,qdot,qddot)          cos(phi(s,q,qdot,qddot,L));
+y_helper=@(s,q,qdot,qddot)          sin(phi(s,q,qdot,qddot,L));
 
 
 for i=1:N_timePoints %for each time point %xx for speed-up, remove for loops and changing array sizes
@@ -70,7 +70,7 @@ for i=1:N_timePoints %for each time point %xx for speed-up, remove for loops and
         %which is closest to the obstacle center (either local minimum OR
         %c=0 OR c=1 - hence the multiplications)
 %         ceq_closestPoint=(tan(phi(c.*L,q,qdot,qddot))+(obst(1)-xp)/(obst(2)-yp))*c*(c-1);
-%         ceq_contact=[ceq_contact;ceq_closestPoint];
+ %        ceq_contact=[ceq_contact;ceq_closestPoint];
           
         % ensure that contact force points away from the obstacle
         contact_direction=[xp;yp]-[obst(1);obst(2)];
