@@ -18,23 +18,26 @@ wi_i=[0.568889,0.478629,0.478629,0.236927,0.236927];
 xi_o=xi_i;
 wi_o=wi_i;
 
-out=0;
+% out=0;
+% 
+% for j=1:length(wi_o)
+% 
+%     inner_sum1=wi_i*transpose(fun1(L.*(xi_o(j)+1).*(xi_i+1)/4,q,qdot,qddot))
+%     
+%     inner_sum2=wi_i*transpose(fun2(L.*(xi_o(j)+1).*(xi_i+1)/4,q,qdot,qddot))
+% 
+%     
+%     out=out+(xi_o(j)+1)^2*wi_o(j)*inner_sum1'*inner_sum2';
+% end
 
-for j=1:length(wi_o)
+s_val2=L.*(xi_o+1)'.*(xi_i+1)./4;
+s_val2=s_val2(:)';
 
-    inner_sum1=wi_i*transpose(fun1(L.*(xi_o(j)+1).*(xi_i+1)/4,q,qdot,qddot));
-    
-    inner_sum2=wi_i*transpose(fun2(L.*(xi_o(j)+1).*(xi_i+1)/4,q,qdot,qddot));
+inner_sum1=reshape(wi_i*reshape(fun1(s_val2,q,qdot,qddot),[],length(xi_o))',[],length(xi_o));   %this dimension needs to be inferred because it is sometimes length(q) for vector fn or just 1D
+inner_sum2=reshape(wi_i*reshape(fun2(s_val2,q,qdot,qddot),[],length(xi_o))',[],length(xi_o));
 
-    
-    out=out+(xi_o(j)+1)^2*wi_o(j)*inner_sum1'*inner_sum2';
-end
-
-%potential speedup through vectorization of the outer loop - but the code below is
-%wrong - it doesnt work for vector functions, only for scalar ones
-% inner_sum1=wi_i*transpose(fun1(L.*(xi_o'+1).*(xi_i+1)./4,q,qdot,qddot));    
-% inner_sum2=wi_i*transpose(fun2(L.*(xi_o'+1).*(xi_i+1)./4,q,qdot,qddot));
-% out=((xi_o+1).^2.*wi_o)*(inner_sum1.*inner_sum2)';
+xio_wio=(xi_o+1).^2.*wi_o; %care, don't forget square here
+out=(inner_sum1.*inner_sum2)*xio_wio';
 
 
 
