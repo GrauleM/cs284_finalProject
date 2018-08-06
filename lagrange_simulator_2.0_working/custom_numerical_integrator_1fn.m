@@ -3,7 +3,7 @@ function out=custom_numerical_integrator_1fn(fun,q,qdot,qddot,L)
 % function handle fun) twice.
 
 % approximates the following integral (latex formatting): 
-% \int_0^L \int_0_s f(s_hat) ds_hat ds
+% \int_0^L \int_0^s f(s_hat) ds_hat ds
 
 % inner integration in s_hat; bounds: 0 to s
 % outer integration in s; bounds: 0 to L

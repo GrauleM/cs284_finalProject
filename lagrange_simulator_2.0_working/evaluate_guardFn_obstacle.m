@@ -28,18 +28,19 @@ for i=1:size(states,2)
     q=states(1:3,i);
     qdot=states(4:6,i); 
     qddot=zeros(3,1);  %xx care, wrong value!
-    
+    % xx error in calculation of xp,yp
     for j=1:size(s_p,1)
        current_sp=s_p(j,i); 
        %compute position of point P (integrate from 0 to s_p*L)
-       xp=custom_numerical_integrator_1fn(...
+       xp=custom_numerical_integrator_1fn_once(...
            x_helper,...
            q,qdot,qddot,current_sp.*L);
-       yp=custom_numerical_integrator_1fn(...
+      
+       yp=custom_numerical_integrator_1fn_once(...
            y_helper,...
            q,qdot,qddot,current_sp.*L);
        
-       dist(j,i)=sqrt((obst(1)-xp)^2+(obst(2)-yp)^2)-obst(3);
+       dist(j,i)=sqrt((obst(1)-xp).^2+(obst(2)-yp).^2)-obst(3);
        
     end     
     

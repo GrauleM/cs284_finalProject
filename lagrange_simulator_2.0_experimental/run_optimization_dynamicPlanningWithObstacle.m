@@ -19,7 +19,7 @@ clear all; close all;
 
 % USER INPUT
 %obstacle obst=[x_obstacle,y_obstacle,r_obstacle]: obstacle center position and radius
-obst=[.45,.20,.05];
+obst=[.45,.30,.05];
 
 %desired end pose
 endPose_des = [1.,-.1,.15*pi];
@@ -33,7 +33,7 @@ constraint_multiplier=10000;
 % xx Note: h0=0.1 and N_timePoints=25 with contact constraints but obstacle
 % far up converged to a solution
 
-N_timePoints = 2;%number of time points;  %xx note: 15 time points required 9k function evaluations without contact
+N_timePoints = 20;%number of time points;  %xx note: 15 time points required 9k function evaluations without contact
 N_contacts=1; %number of contact points (at least 1)
 
 % optimization with following decision variables: actuator moments Ma, step
@@ -64,7 +64,7 @@ forces0=zeros(2*N_contacts+1,N_timePoints); %xx consider other initializations
 
 forces0(2:2+N_contacts-1,:) = 50.*(rand(1,N_timePoints)-.5);
 forces0(1+N_contacts+1:end,:)=rand(N_contacts,N_timePoints); %initialize all contact locations to be between 0 and 1
-slackVariables0=(rand(N_contacts,N_timePoints))/.1; %not sure this is the best initialization
+slackVariables0=(rand(N_contacts,N_timePoints))/1.; %not sure this is the best initialization
 
 if INITIALIZE %initialize states with solution from obstacle free simulation
     load('saved_xfinal_ContactAbove_newObjective_30timepoints.mat','x_final','h_final');
@@ -141,6 +141,9 @@ end
 states_final=x_final(1:6,2:end);
 forces_final=x_final(7:7+2*N_contacts+1-1,2:end);
 contactPoints_final=forces_final(1+N_contacts+1:end,:);
+
+slackVariables_final=x_final(8+N_contacts-1+N_contacts+1:end,2:end)
+
 h1=figure(1);
 clf;
 axis equal;
@@ -165,8 +168,6 @@ set(hc, 'YTick',(cb-.5)./N_timePoints, 'YTickLabel',cb)
 viscircles(obst(1:2),obst(3)) % draw the cicular obstacle
 hold off;
 
-slackVariables_final=x_final(8+N_contacts-1+N_contacts+1:end,2:end)
-
 %% plot tip positions
 h3=figure(3);
 plot_tipPos_timeSeries(forces_final,states_final(1:3,:),L0,h3,h_final)
@@ -180,3 +181,20 @@ end
 %check penetration constraints
 %p_test=penetration_constraints(states0,obst,L0)
 
+
+%% print contact points
+contactPoints_final
+
+evaluate_guardFn_obstacle(states_final,contactPoints_final,obst,L0)
+
+sqrt((0.9487-obst(1)).^2+obst(2).^2)-obst(3)
+
+sqrt((obst(1)-0.9487).^2+(obst(2)-0).^2)-obst(3)
+
+%xx todo fix 
+%xx make sure it runs for all L (i.e. not only L=1 - potential errors in
+%custom integraters (specially for xp and yp) 
+
+% make sure all xp yp are computed correctly (i.e., using the function
+% custom_numerical_integrator_1fn_once(...) instead of
+% custom_numerical_integrator_1fn(...))

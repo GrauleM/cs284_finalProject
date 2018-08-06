@@ -30,7 +30,7 @@ out=custom_numerical_integrator_1fn(fn,q,qdot,qddot,L)
 
 % test 4
 %test_fn
-fn=@(s,q,qdot,qddot) s^2;
+fn=@(s,q,qdot,qddot) s.^2;
 %estimation:
 out=custom_numerical_integrator_1fn(fn,q,qdot,qddot,L)
 %true solution:
@@ -44,7 +44,13 @@ out=custom_numerical_integrator_1fn(fn,q,qdot,qddot,L)
 %true solution:
 exp(L)-L-(exp(0)-0)
 
-
+% test 6
+%test_fn
+fn=@(s,q,qdot,qddot) s.^2;
+%estimation:
+out=custom_numerical_integrator_1fn(fn,q,qdot,qddot,0.3.*L)
+%true solution:
+1/12*(0.3.*L)^4
 
 %% test code for custom_numerical_integrator_2fn.m
 q=1;qdot=0;qddot=0;

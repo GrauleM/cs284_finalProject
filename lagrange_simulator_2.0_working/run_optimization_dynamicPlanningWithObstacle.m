@@ -141,6 +141,9 @@ end
 states_final=x_final(1:6,2:end);
 forces_final=x_final(7:7+2*N_contacts+1-1,2:end);
 contactPoints_final=forces_final(1+N_contacts+1:end,:);
+
+slackVariables_final=x_final(8+N_contacts-1+N_contacts+1:end,2:end)
+
 h1=figure(1);
 clf;
 axis equal;
@@ -178,3 +181,20 @@ end
 %check penetration constraints
 %p_test=penetration_constraints(states0,obst,L0)
 
+
+%% print contact points
+contactPoints_final
+
+evaluate_guardFn_obstacle(states_final,contactPoints_final,obst,L0)
+
+sqrt((0.9487-obst(1)).^2+obst(2).^2)-obst(3)
+
+sqrt((obst(1)-0.9487).^2+(obst(2)-0).^2)-obst(3)
+
+%xx todo fix 
+%xx make sure it runs for all L (i.e. not only L=1 - potential errors in
+%custom integraters (specially for xp and yp) 
+
+% make sure all xp yp are computed correctly (i.e., using the function
+% custom_numerical_integrator_1fn_once(...) instead of
+% custom_numerical_integrator_1fn(...))

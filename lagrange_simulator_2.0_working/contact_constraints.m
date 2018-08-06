@@ -59,18 +59,18 @@ for i=1:N_timePoints %for each time point %xx for speed-up, remove for loops and
         current_force_direction=force_direction(c.*L,q,qdot,qddot,L);
 
         %compute position of point P (integrate from 0 to s_p*L)
-        xp=custom_numerical_integrator_1fn(...
+        xp=custom_numerical_integrator_1fn_once(...
            x_helper,...
            q,qdot,qddot,c.*L);
-        yp=custom_numerical_integrator_1fn(...
+        yp=custom_numerical_integrator_1fn_once(...
            y_helper,...
            q,qdot,qddot,c.*L);
         
         %make sure that the contact point c is the point on the manipulator
         %which is closest to the obstacle center (either local minimum OR
         %c=0 OR c=1 - hence the multiplications)
-%         ceq_closestPoint=(tan(phi(c.*L,q,qdot,qddot))+(obst(1)-xp)/(obst(2)-yp))*c*(c-1);
-%         ceq_contact=[ceq_contact;ceq_closestPoint];
+        % ceq_closestPoint=(tan(phi(c.*L,q,qdot,qddot,L))+(obst(1)-xp)/(obst(2)-yp))*c*(c-1);
+        % ceq_contact=[ceq_contact;ceq_closestPoint];
           
         % ensure that contact force points away from the obstacle
         contact_direction=[xp;yp]-[obst(1);obst(2)];

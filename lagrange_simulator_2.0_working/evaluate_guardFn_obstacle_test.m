@@ -1,4 +1,4 @@
-function neg_dist = evaluate_guardFn_obstacle(states,s_p,obst,L)
+function neg_dist = evaluate_guardFn_obstacle_test(states,s_p,obst,L)
 % computes the distance between the obstacle boundary and points P on the 
 % manipulator (each point is defined by respective s_p, where s_p goes from 0 to 1)
 % arc length s for point P is s_p*L (L being total manipulator length)
