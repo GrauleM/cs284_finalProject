@@ -19,7 +19,7 @@ clear all; close all;
 
 % USER INPUT
 %obstacle obst=[x_obstacle,y_obstacle,r_obstacle]: obstacle center position and radius
-obst=[.45,.20,.05];
+obst=[.45,.060,.05];
 
 %desired end pose
 endPose_des = [1.,-.1,.15*pi];
@@ -33,7 +33,7 @@ constraint_multiplier=10000;
 % xx Note: h0=0.1 and N_timePoints=25 with contact constraints but obstacle
 % far up converged to a solution
 
-N_timePoints = 2;%number of time points;  %xx note: 15 time points required 9k function evaluations without contact
+N_timePoints = 1;%number of time points;  %xx note: 15 time points required 9k function evaluations without contact
 N_contacts=1; %number of contact points (at least 1)
 
 % optimization with following decision variables: actuator moments Ma, step
@@ -179,7 +179,7 @@ end
 
 %% 
 %check penetration constraints
-%p_test=penetration_constraints(states0,obst,L0)
+p_test=penetration_constraints(states_final,obst,L0)
 
 
 %% print contact points
@@ -198,6 +198,3 @@ sqrt((obst(1)-0.9487).^2+(obst(2)-0).^2)-obst(3)
 % make sure all xp yp are computed correctly (i.e., using the function
 % custom_numerical_integrator_1fn_once(...) instead of
 % custom_numerical_integrator_1fn(...))
-
-% XX TOTAL MANIPULATOR LENGTH VS L (i.e., integration along position should
-% equal L)

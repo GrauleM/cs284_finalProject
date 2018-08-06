@@ -1,7 +1,6 @@
-% this file solves the problem of kinematic planning with contacts. 
+% this file solves the problem of final state planning with contacts. 
 % this version finds the actuator
-% states, tip moments, contact forces, contact points, and integration step
-% length for given objective (e.g. final tip position) and obstacle
+% state, tip moment, contact forces, contact points, for a given objective (e.g. final tip position) and obstacle
 
 % this version (as everything in this
 % folder) is intended to be used for constant length elements only. this
@@ -19,7 +18,7 @@ clear all; close all;
 
 % USER INPUT
 %obstacle obst=[x_obstacle,y_obstacle,r_obstacle]: obstacle center position and radius
-obst=[.45,.20,.05];
+obst=[.45,-.20,.05];
 
 %desired end pose
 endPose_des = [1.,-.1,.15*pi];
@@ -33,7 +32,7 @@ constraint_multiplier=10000;
 % xx Note: h0=0.1 and N_timePoints=25 with contact constraints but obstacle
 % far up converged to a solution
 
-N_timePoints = 2;%number of time points;  %xx note: 15 time points required 9k function evaluations without contact
+N_timePoints = 1;%number of time points;  %xx note: 15 time points required 9k function evaluations without contact
 N_contacts=1; %number of contact points (at least 1)
 
 % optimization with following decision variables: actuator moments Ma, step
@@ -48,8 +47,6 @@ N_contacts=1; %number of contact points (at least 1)
 % structure of states: each colum is one time point of the form [q;qdot]
 % structure of x: % x= [h;0;0...., [states;forces;slackVariables] ]
 % h: add required zero padding
-
-INITIALIZE=0; %if set to one, use old contact free states for initialization
 
 
 % initializations
@@ -66,14 +63,7 @@ forces0(2:2+N_contacts-1,:) = 50.*(rand(1,N_timePoints)-.5);
 forces0(1+N_contacts+1:end,:)=rand(N_contacts,N_timePoints); %initialize all contact locations to be between 0 and 1
 slackVariables0=(rand(N_contacts,N_timePoints))/1.; %not sure this is the best initialization
 
-if INITIALIZE %initialize states with solution from obstacle free simulation
-    load('saved_xfinal_ContactAbove_newObjective_30timepoints.mat','x_final','h_final');
-    states0=x_final(1:6,2:end); %states
-    forces0(1,:)=x_final(7,2:end); %tip moments
-    forces0(2:2+N_contacts-1,:)=x_final(8:8+N_contacts-1,2:end); %contact forces
-    slackVariables0=x_final(8+N_contacts-1+N_contacts+1:end,2:end);
-    h0=h_final;
-end
+
 
 x0=[[h0;zeros(2*3+1+3*N_contacts-1,1)], [states0;forces0;slackVariables0]];
 
@@ -122,13 +112,13 @@ options = optimoptions(@fmincon,'Algorithm','sqp','Display','iter');
 options = optimoptions(options,'ConstraintTolerance',1e-6,...
                                'FunctionTolerance',1e-6);
 options = optimoptions(options,'SpecifyObjectiveGradient',false,'SpecifyConstraintGradient',false);
-options = optimoptions(options,'MaxFunctionEvaluations',30000);
+options = optimoptions(options,'MaxFunctionEvaluations',20000);
 
 lb = [ ]; ub = [ ];   % No upper or lower bounds
 [x_final,fval] = fmincon(...
-    @(x) objective_dynamicContactPlanner(x,params,obst),...
+    @(x) objective_kineticContactPlanner(x,params,obst),...
     x0,[],[],[],[],lb,ub,... 
-    @(x)allConstraints_dynamicContactPlanner(x,params,constraint_multiplier,obst),...
+    @(x)allConstraints_kineticContactPlanner(x,params,constraint_multiplier,obst),...
     options);
 
 %% unpack states and plot
@@ -140,9 +130,6 @@ if 1 %if h was set to be constant previously
 end
 states_final=x_final(1:6,2:end);
 forces_final=x_final(7:7+2*N_contacts+1-1,2:end);
-contactPoints_final=forces_final(1+N_contacts+1:end,:);
-
-slackVariables_final=x_final(8+N_contacts-1+N_contacts+1:end,2:end)
 
 h1=figure(1);
 clf;
@@ -153,8 +140,7 @@ colormap(jet(N_timePoints));
 for t=1:N_timePoints
     color=colors(t,:);
     q = states_final(1:3,t);
-    contactPoints=contactPoints_final(:,t);
-    visualize_q_wContact(q,contactPoints,L0,h1,color,'-')
+    visualize_q(q,L0,h1,color,'-')
 end
 
 % use these axis limits for the following plots
@@ -177,27 +163,3 @@ if 0
    save('saved_xfinal_ContactBelow_newObjective_30timepoints_initializedFailed.mat');
 end
 
-%% 
-%check penetration constraints
-%p_test=penetration_constraints(states0,obst,L0)
-
-
-%% print contact points
-contactPoints_final
-
-evaluate_guardFn_obstacle(states_final,contactPoints_final,obst,L0)
-
-sqrt((0.9487-obst(1)).^2+obst(2).^2)-obst(3)
-
-sqrt((obst(1)-0.9487).^2+(obst(2)-0).^2)-obst(3)
-
-%xx todo fix 
-%xx make sure it runs for all L (i.e. not only L=1 - potential errors in
-%custom integraters (specially for xp and yp) 
-
-% make sure all xp yp are computed correctly (i.e., using the function
-% custom_numerical_integrator_1fn_once(...) instead of
-% custom_numerical_integrator_1fn(...))
-
-% XX TOTAL MANIPULATOR LENGTH VS L (i.e., integration along position should
-% equal L)
