@@ -1,4 +1,4 @@
-function [f,gradf] = objective_kinematicContactPlanner(x,params,obst)
+function [f,gradf] = objective_dynamicContactPlanner(x,params,obst)
 %used in the version that finds the manipulator configurations, time step length h, 
 % actuator moments Ma under contact with a round obstacle
 
@@ -37,7 +37,7 @@ end
 
 %f=ob1+100000*ob2+ob3+ob4; % this doesnt seem to work (convergence to
 %infeasible point
-f=ob1+ob2+ob3+ob4;  % but this works
-
+f=ob1+ob2+ob3+100000.*ob4;  % but this doesnt work yet - leads to actuator moment instead of moving contact point
+f=1000.*ob1+ob2+ob3+100000.*ob4;
 
 end

@@ -1,6 +1,9 @@
 function visualize_q(q_in,L0,figHandle,color,style)
 
-    % this code is only capable of handling initial curvatures of 0; slight adjustments are required for the more general case
+    % visualizes q and contact points
+    % this code is only capable of handling unloaded curvatures of 0; slight adjustments are required for the more general case
+    
+    
     q=[q_in;L0]; %xx quick hack to be able to use the old visualization function
     all_s=(0:.001:1).*q(4); 
 
@@ -12,7 +15,6 @@ function visualize_q(q_in,L0,figHandle,color,style)
     sin_phi_s =@(s) sin(phi_s(s));  
 
     all_phi=phi_s(all_s);
-    length(x_s);
     for i=1:length(x_s)
         x_s(i)=integral(cos_phi_s,0,all_s(i)); %xx here it may be better to do gauss-legendre quadrature
         y_s(i)=integral(sin_phi_s,0,all_s(i)); %xx here it may be better to do gauss-legendre quadrature
@@ -22,6 +24,6 @@ function visualize_q(q_in,L0,figHandle,color,style)
     hold on
     plot(x_s,y_s,style,'Color',color);
     axis equal
-
+    
 
 end

@@ -14,11 +14,11 @@ N_timePoints=size(slackVariables,2);
 
 % directionality vector for contact force
 % define some helper functions
-%phi     =@(s,q,qdot,qddot)          q(1).*s./L+q(2).*(s.^2./L.^2-s./L)+q(3).*(2.*s.^3./L.^3-3.*s.^2./L.^2+s./L); %xx todo: replace with global phi
+% phi     =@(s,q,qdot,qddot)          q(1).*s./L+q(2).*(s.^2./L.^2-s./L)+q(3).*(2.*s.^3./L.^3-3.*s.^2./L.^2+s./L); %xx todo: replace with global phi
 
 
 %direction of contact force at contact point defined by c
-force_direction = @(s,q,qdot,qddot) [...
+force_direction = @(s,q,qdot,qddot,L) [...
                         sin(phi(s,q,qdot,qddot,L));...
                         -cos(phi(s,q,qdot,qddot,L))];
 
@@ -56,7 +56,7 @@ for i=1:N_timePoints %for each time point %xx for speed-up, remove for loops and
         
         %direction of contact force
         q=states(1:3,i); qdot=[]; qddot=[];
-        current_force_direction=force_direction(c.*L,q,qdot,qddot);
+        current_force_direction=force_direction(c.*L,q,qdot,qddot,L);
 
         %compute position of point P (integrate from 0 to s_p*L)
         xp=custom_numerical_integrator_1fn(...
@@ -70,7 +70,7 @@ for i=1:N_timePoints %for each time point %xx for speed-up, remove for loops and
         %which is closest to the obstacle center (either local minimum OR
         %c=0 OR c=1 - hence the multiplications)
 %         ceq_closestPoint=(tan(phi(c.*L,q,qdot,qddot))+(obst(1)-xp)/(obst(2)-yp))*c*(c-1);
- %        ceq_contact=[ceq_contact;ceq_closestPoint];
+%         ceq_contact=[ceq_contact;ceq_closestPoint];
           
         % ensure that contact force points away from the obstacle
         contact_direction=[xp;yp]-[obst(1);obst(2)];
