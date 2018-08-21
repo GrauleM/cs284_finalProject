@@ -36,6 +36,7 @@ for i=1:N_contacts
     %seenms wrong, i.e., it doesnt work
 
 end
+ob4=0;
 
 
 %f=ob1+100000*ob2+ob3+ob4; % this doesnt seem to work (convergence to

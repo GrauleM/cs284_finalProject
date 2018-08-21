@@ -92,7 +92,7 @@ end
 
 
 % add final state constraint if applicable
-ceq_final=[];
+ceq_final=[]; %no final state constraint
 ceq=[ceq;ceq_final];
 
 
@@ -100,16 +100,23 @@ ceq=[ceq;ceq_final];
 %are zero (equilibrium at the end). xx be very careful with this constraint.
 %only add it, if h is variable. even then, it may lead to infeasible
 %solutions. may be better to have this in the objective
-%ceq=[ceq;qdot;qddot];
+ceq=[ceq;qdot;qddot];
+ceq=[ceq;qdot1]; % XX for debugging purposes: want static solution with 3 time points
+ceq=[ceq;qdot0-qdot1]; % XX for debugging purposes: want static solution with 3 time points
+ceq=[ceq;q0-q1]; % XX for debugging purposes: want static solution with 3 time points
+
+
 
 % add start state constraint if applicable
 q_desired_start=zeros(3,1);
 ceq_start=constraint_StartConfiguration(q_desired_start,states);
+ceq_start=[]; %no start state constraint
 ceq=[ceq;ceq_start];
 
 % add start velocity constraint if applicable
 qdot_desired_start=zeros(3,1);
 ceq_start=constraint_StartVelocity(qdot_desired_start,states);
+%ceq_start=[]; %no start velocity constraint
 ceq=[ceq;ceq_start];
 
 
