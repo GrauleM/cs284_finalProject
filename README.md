@@ -14,5 +14,7 @@ to do dynamic contact planner:
 # open questions
 - why does the curling happen so often
 - in the current experimental set to be static, why are resulting moments not constant?
+- in the current experimental set to static, why are convergence properties so bad?
+- what are efficient ways to improve convergence? prescribed procedures? how to get a sense of which constraints are easy/hard to fulfill?
 
 # important: most 'correct' version right now is the one in the experimental folder
