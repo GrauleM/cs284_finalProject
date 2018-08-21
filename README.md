@@ -9,3 +9,4 @@ to do dynamic contact planner:
 - remember to remove start/stop constraint if it is in an infeasible position 
 - remember to include constraints for all derivatives between decision variables
 - things that may be impossible to fulfill: cost function, not constraint!
+- when including dybnamic effects in the Euler_Lagrange equation, always make sure to test with multiple time points
