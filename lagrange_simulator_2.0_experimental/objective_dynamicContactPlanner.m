@@ -9,9 +9,9 @@ h=x(1,1);
 states=x(1:6,2:end);
 N_timePoints = size(states,2);%number of time points;
 
-N_contacts=(size(x,1)-6-1)/3; %-6 for 6 states, -1 for tip moment Ma
+N_contacts=(size(x,1)-6-1)/3; %minus 6 for 6 states, minus 1 for tip moment Ma
 
-forces=x(7:7+2*N_contacts+1,2:end);
+forces=x(7:7+2*N_contacts+1-1,2:end);
 slackVariables=x(7+2*N_contacts+1:end,2:end);
 
 % objective 1: minimize slack variables from contact/complementarity
@@ -43,6 +43,7 @@ ob4=0;
 %infeasible point
 f=ob1+ob2+ob3+ob4;  % but this works
 %f=ob1+ob2+ob3+100.*ob4;  
+f=ob1+10000000.*ob2+100000.*ob3+ob4;  % xx experimental not sure if this works
 
 
 end

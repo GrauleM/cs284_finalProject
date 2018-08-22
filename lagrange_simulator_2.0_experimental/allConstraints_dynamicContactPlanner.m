@@ -104,8 +104,18 @@ ceq=[ceq;qdot;qddot];
 ceq=[ceq;qdot1]; % XX for debugging purposes: want static solution with 3 time points
 ceq=[ceq;qdot0-qdot1]; % XX for debugging purposes: want static solution with 3 time points
 ceq=[ceq;q0-q1]; % XX for debugging purposes: want static solution with 3 time points
-
-
+ceq=[ceq;forces(1,1)-forces(1,2)];% XX for debugging purposes: want static solution with 3 time points that
+% has constant moment
+ceq=[ceq;forces(1,3)-forces(1,2)];% XX for debugging purposes: want static solution with 3 time points that
+% has constant moment
+ceq=[ceq;forces(2,1)-forces(2,2)];% XX for debugging purposes: want static solution with 3 time points that
+% has constant contact force
+ceq=[ceq;forces(2,3)-forces(2,2)];% XX for debugging purposes: want static solution with 3 time points that
+% has constant contact force
+ceq=[ceq;forces(3,1)-forces(3,2)];% XX for debugging purposes: want static solution with 3 time points that
+% has constant contact location
+ceq=[ceq;forces(3,3)-forces(3,2)];% XX for debugging purposes: want static solution with 3 time points that
+% has constant contact location
 
 % add start state constraint if applicable
 q_desired_start=zeros(3,1);

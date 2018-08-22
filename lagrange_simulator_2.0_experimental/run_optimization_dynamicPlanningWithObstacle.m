@@ -64,7 +64,7 @@ forces0=zeros(2*N_contacts+1,N_timePoints); %xx consider other initializations
 
 forces0(2:2+N_contacts-1,:) = 50.*(rand(1,N_timePoints)-.5);
 forces0(1+N_contacts+1:end,:)=rand(N_contacts,N_timePoints); %initialize all contact locations to be between 0 and 1
-slackVariables0=(rand(N_contacts,N_timePoints))/1.; %not sure this is the best initialization
+slackVariables0=(rand(N_contacts,N_timePoints))/.1; %not sure this is the best initialization
 
 if INITIALIZE %initialize states with solution from obstacle free simulation
     load('previous.mat','x_final','h_final');
@@ -123,6 +123,8 @@ options = optimoptions(options,'ConstraintTolerance',1e-6,...
                                'FunctionTolerance',1e-6);
 options = optimoptions(options,'SpecifyObjectiveGradient',false,'SpecifyConstraintGradient',false);
 options = optimoptions(options,'MaxFunctionEvaluations',30000);
+options = optimoptions(options,'StepTolerance',1e-15);
+
 
 lb = [ ]; ub = [ ];   % No upper or lower bounds
 [x_final,fval] = fmincon(...
