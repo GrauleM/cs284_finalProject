@@ -18,3 +18,6 @@ to do dynamic contact planner:
 - what are efficient ways to improve convergence? prescribed procedures? how to get a sense of which constraints are easy/hard to fulfill?
 
 # important: most 'correct' version right now is the one in the experimental folder
+
+# some more observations
+- optimization often stoped prematurely because the step size was below the step size tolerance. reducing this tolerance to 1e-15 may have helped (not entirely sure)
