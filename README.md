@@ -20,4 +20,4 @@ to do dynamic contact planner:
 # important: most 'correct' version right now is the one in the experimental folder
 
 # some more observations
-- optimization often stoped prematurely because the step size was below the step size tolerance. reducing this tolerance to 1e-10 seemed to help
+- optimization often stoped prematurely because the step size was below the step size tolerance. reducing this tolerance to 1e-15 may have helped (not entirely sure)
